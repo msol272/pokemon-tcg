@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New User</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #cccccc;
+        }
+        form {
+            display: inline-block;
+            margin-top: 50px;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        input[type="text"] {
+            width: 300px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create New User</h1>
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="error">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Enter new username" required>
+        <br>
+        <button type="submit">Create User</button>
+    </form>
+
+    <br><br>
+    <a href="{{ url_for('home.home') }}" style="color: #ffffff">Back to Home</a>
+</body>
+</html>

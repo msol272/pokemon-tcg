@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon TCG</title>
+    <style>
+        a {
+           text-decoration: none;  /* Removes underline from all anchor tags */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #cccccc;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            padding: 50px;
+        }
+        .pane {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            width: 40%;
+            background-color: #303030;
+        }
+        .pane h2 {
+            margin-bottom: 20px;
+        }
+        .pane button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .pane .new-user-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .pane .join-seat1-btn {
+            background-color: #FF6F61;
+            color: white;
+        }
+        .pane .join-seat2-btn {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pokemon TCG</h1>
+
+    <div class="container">
+        <!-- Manage Cards & Decks Pane -->
+        <div class="pane">
+            <h2>Manage Cards & Decks</h2>
+            {% for user in users %}
+                <a href="{{ url_for('users.user_page', username=user) }}">
+                    <button>{{ user }}</button>
+                </a>
+            {% endfor %}
+            <a href="{{ url_for('users.new_user') }}">
+                <button class="new-user-btn">New User</button>
+            </a>
+        </div>
+
+        <!-- Play a Game Pane -->
+        <div class="pane">
+            <h2>Play a Game</h2>
+            <button class="join-seat1-btn">Join in Seat 1</button>
+            <button class="join-seat2-btn">Join in Seat 2</button>
+        </div>
+    </div>
+</body>
+</html>

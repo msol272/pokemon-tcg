@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ username }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #cccccc;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .pane {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .decks {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .deck-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .deck-list li {
+            padding: 10px;
+            border: 1px solid #555;
+            margin-bottom: 10px;
+            background-color: #3a3a3a;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        a {
+            text-decoration: none;
+            color: white;
+        }
+        .create-new {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ username }}</h1>
+
+    <!-- View/Edit Card Collection Button -->
+    <div class="pane">
+        <button onclick="window.location.href='{{ url_for('collection.view_edit_collection', username=username) }}'">View/Edit Card Collection</button>
+    </div>
+
+    <!-- View/Edit Decks Pane -->
+    <div class="pane decks">
+        <h2>View / Edit Decks</h2>
+        <ul class="deck-list">
+            {% for deck in decks %}
+                <li>
+                    <span>{{ deck }}</span>
+                    <button>Edit</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <button class="create-new">Create New</button>
+    </div>
+
+    <br><br>
+    <a href="{{ url_for('home.home') }}" style="color: #ffffff">Back to Home</a>
+</body>
+</html>

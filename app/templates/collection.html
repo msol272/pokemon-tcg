@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ username }}'s Collection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #cccccc;
+            position: relative;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+        .card {
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+            transition: background-color 0.3s;
+        }
+        .highlight {
+            background-color: #FFDE21;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        input[type="text"] {
+            width: 50px;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        .save-collection {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .save-collection:hover {
+            background-color: #0056b3;
+        }
+        #search-bar {
+            width: 300px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+        #view-mode, #card-type {
+            margin-left: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>{{ username }}'s Card Collection</h1>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="search-bar" placeholder="Search for a card..." oninput="filterCards()">
+        <select id="view-mode" onchange="filterCards()">
+            <option value="all">All Cards</option>
+            <option value="owned">Owned Cards</option>
+            <option value="unowned">Unowned Cards</option>
+        </select>
+        <select id="card-type" onchange="filterCards()">
+            <option value="All">All Types</option>
+            <option value="Grass">Grass</option>
+            <option value="Fire">Fire</option>
+            <option value="Water">Water</option>
+            <option value="Lightning">Lightning</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Psychic">Psychic</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Darkness">Darkness</option>
+            <option value="Colorless">Colorless</option>
+            <option value="Trainer">Trainer</option>
+            <option value="Energy">Energy</option>
+
+        </select>
+    </div>
+
+    <form method="POST">
+        <button type="submit" class="save-collection">Save Collection</button>
+        <div class="grid">
+            {% for card in all_cards %}
+            <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}">
+                <img src="{{ url_for('static', filename='images/' + card.id + '.jpg') }}" alt="{{ card.name }}" id="img-{{ card.id }}">
+                <div class="controls">
+                    <button type="button" onclick="decreaseCount('{{ card.id }}')">-</button>
+                    <input type="text" name="{{ card.id }}" id="count-{{ card.id }}" value="{{ collection.get(card.id, 0) }}" readonly>
+                    <button type="button" onclick="increaseCount('{{ card.id }}')">+</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+
+    <script>
+        function increaseCount(cardNumber) {
+            const input = document.getElementById(`count-${cardNumber}`);
+            const card = document.getElementById(`card-${cardNumber}`);
+            let currentValue = parseInt(input.value) || 0;
+            input.value = currentValue + 1;
+
+            if (currentValue + 1 > 0) {
+                card.classList.add('highlight');
+            }
+        }
+
+        function decreaseCount(cardNumber) {
+            const input = document.getElementById(`count-${cardNumber}`);
+            const card = document.getElementById(`card-${cardNumber}`);
+            let currentValue = parseInt(input.value) || 0;
+
+            if (currentValue > 0) {
+                input.value = currentValue - 1;
+            }
+
+            if (currentValue - 1 <= 0) {
+                card.classList.remove('highlight');
+            }
+        }
+
+        // Initialize highlight for cards that already have a count > 0
+        document.querySelectorAll('input[type="text"]').forEach(function(input) {
+            const cardNumber = input.name;
+            const card = document.getElementById(`card-${cardNumber}`);
+            if (parseInt(input.value) > 0) {
+                card.classList.add('highlight');
+            }
+        });
+
+        // Function to filter cards in real time
+        function filterCards() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const viewMode = document.getElementById('view-mode').value;
+            const type = document.getElementById('card-type').value;
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const cardName = card.querySelector('img').alt.toLowerCase();
+                const count = parseInt(card.querySelector('input[type="text"]').value) || 0;
+                const cardType = card.getAttribute('card-type');
+
+                // Check if card matches the search query
+                const matchesQuery = cardName.includes(query);
+
+                // Check if card matches the view mode (all, owned, unowned)
+                let matchesViewMode = true;
+                if (viewMode === 'owned' && count === 0) {
+                    matchesViewMode = false;
+                } else if (viewMode === 'unowned' && count > 0) {
+                    matchesViewMode = false;
+                }
+
+                // Check if card matches the energy type (or 'all' if no filter)
+                let matchesType = false;
+                if (type === 'All') {
+                    matchesType = true;
+                } else if (type === cardType) {
+                    matchesType = true;
+                }
+
+                // Show or hide card based on all filters
+                if (matchesQuery && matchesViewMode && matchesType) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
