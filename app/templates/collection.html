@@ -11,12 +11,6 @@
             color: #cccccc;
             position: relative;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            padding: 10px;
-        }
         .card {
             border: 1px solid #333;
             padding: 10px;
@@ -86,6 +80,92 @@
             background-color: #2a2a2a;
             color: #fff;
         }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%; /* Can be adjusted */
+            max-width: 700px; /* Can be adjusted */
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #caption {
+            margin: auto;
+            display: block;
+            text-align: center;
+            color: #ccc;
+            padding: 10px 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .summary-panel {
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            color: #cccccc;
+            margin-left: 20px; /* Space between grid and summary */
+            position: sticky;   /* Make it sticky */
+            top: 20px;         /* Offset from the top */
+            height: fit-content; /* Allow height to fit content */
+        }
+
+        .summary-panel h2 {
+            text-align: center;
+        }
+
+        .summary-panel ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .summary-panel li {
+            margin: 10px 0;
+        }
+
+        .summary-panel li strong {
+            font-size: 1.2em; /* Increase size for total */
+        }
     </style>
 </head>
 <body>
@@ -118,21 +198,78 @@
 
     <form method="POST">
         <button type="submit" class="save-collection">Save Collection</button>
-        <div class="grid">
-            {% for card in all_cards %}
-            <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}">
-                <img src="{{ url_for('static', filename='images/' + card.id + '.jpg') }}" alt="{{ card.name }}" id="img-{{ card.id }}">
-                <div class="controls">
-                    <button type="button" onclick="decreaseCount('{{ card.id }}')">-</button>
-                    <input type="text" name="{{ card.id }}" id="count-{{ card.id }}" value="{{ collection.get(card.id, 0) }}" readonly>
-                    <button type="button" onclick="increaseCount('{{ card.id }}')">+</button>
+        <div class="container">
+            <div class="grid">
+                {% for card in all_cards %}
+                <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}">
+                    <img src="{{ url_for('static', filename='images/' + card.id + '.jpg') }}" alt="{{ card.name }}" id="img-{{ card.id }}" onclick="openModal('{{ card.id }}')">
+                    <div class="controls">
+                        <button type="button" onclick="decreaseCount('{{ card.id }}')">-</button>
+                        <input type="text" name="{{ card.id }}" id="count-{{ card.id }}" value="{{ collection.get(card.id, 0) }}" readonly>
+                        <button type="button" onclick="increaseCount('{{ card.id }}')">+</button>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+
+            <!-- Summary Panel -->
+            <div class="summary-panel">
+                <h2>Summary</h2>
+                <ul>
+                    <li>Pokémon: {{ total_pokemon_count }} ({{ unique_pokemon_count }} unique)</li>
+                    <li>Trainers:{{ total_trainer_count }} ({{ unique_trainer_count }} unique)</li>
+                    <li>Energy: {{ total_energy_count }} ({{ unique_energy_count }} unique)</li>
+                    <li><strong>Total: {{ total_pokemon_count + total_trainer_count + total_energy_count }} ({{ unique_pokemon_count + unique_trainer_count + unique_energy_count }} unique)</strong></li>
+                </ul>
+            </div>
+
+            <!-- Modal structure -->
+            <div id="modal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <img class="modal-content" id="modal-image">
+                <div id="caption"></div>
+            </div>
         </div>
     </form>
 
     <script>
+        function updateSummary() {
+            let totalPokemonCount = 0;
+            let uniquePokemonCount = 0;
+            let totalEnergyCount = 0;
+            let uniqueEnergyCount = 0;
+            let totalTrainerCount = 0;
+            let uniqueTrainerCount = 0;
+
+            // Get all cards and their counts
+            const cards = document.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const cardType = card.getAttribute('card-type');
+                const input = card.querySelector('input[type="text"]');
+                const count = parseInt(input.value) || 0;
+
+                if (count > 0) {
+                    if (cardType === 'Energy') {
+                        totalEnergyCount += count;
+                        uniqueEnergyCount += 1
+                    } else if (cardType === 'Trainer') {
+                        totalTrainerCount += count;
+                        uniqueTrainerCount += 1
+                    } else {
+                        totalPokemonCount += count;
+                        uniquePokemonCount += 1
+                    }
+                }
+            });
+
+            // Update the summary panel
+            const summaryPanel = document.querySelector('.summary-panel');
+            summaryPanel.querySelector('ul li:nth-child(1)').innerText = `Pokémon: ${totalPokemonCount} (${uniquePokemonCount} unique)`;
+            summaryPanel.querySelector('ul li:nth-child(2)').innerText = `Trainers: ${totalTrainerCount} (${uniqueTrainerCount} unique)`;
+            summaryPanel.querySelector('ul li:nth-child(3)').innerText = `Energy: ${totalEnergyCount} (${uniqueEnergyCount} unique)`;
+            summaryPanel.querySelector('ul li:last-child strong').innerText = `Total: ${totalPokemonCount + totalTrainerCount + totalEnergyCount} (${uniquePokemonCount + uniqueTrainerCount + uniqueEnergyCount} unique)`;
+        }
         function increaseCount(cardNumber) {
             const input = document.getElementById(`count-${cardNumber}`);
             const card = document.getElementById(`card-${cardNumber}`);
@@ -142,6 +279,7 @@
             if (currentValue + 1 > 0) {
                 card.classList.add('highlight');
             }
+            updateSummary();
         }
 
         function decreaseCount(cardNumber) {
@@ -156,6 +294,7 @@
             if (currentValue - 1 <= 0) {
                 card.classList.remove('highlight');
             }
+            updateSummary();
         }
 
         // Initialize highlight for cards that already have a count > 0
@@ -205,6 +344,24 @@
                     card.style.display = 'none';
                 }
             });
+        }
+
+        function openModal(cardNumber) {
+            const modal = document.getElementById("modal");
+            const modalImage = document.getElementById("modal-image");
+            const caption = document.getElementById("caption");
+
+            // Set the image source and caption
+            modalImage.src = document.getElementById(`img-${cardNumber}`).src; // Get the clicked card's image source
+            caption.innerHTML = document.getElementById(`img-${cardNumber}`).alt; // Get the card's name for caption
+
+            // Display the modal
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("modal");
+            modal.style.display = "none"; // Hide the modal
         }
     </script>
 </body>

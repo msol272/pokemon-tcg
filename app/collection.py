@@ -55,4 +55,33 @@ def view_edit_collection(username):
             cardType = card["types"][0]
         card["cardtype"] = cardType
 
-    return render_template('collection.html', username=username, collection=collection, all_cards=all_cards)
+    # Calculate summary statistics
+    unique_pokemon_count = 0
+    total_pokemon_count = 0
+    unique_trainer_count = 0
+    total_trainer_count = 0
+    unique_energy_count = 0
+    total_energy_count = 0
+
+    for card in all_cards:
+        card_id = card["id"]
+        count = collection.get(card_id, 0)
+        card_type = card["cardtype"]
+
+        if count > 0:
+            if card_type == "Energy":
+                unique_energy_count += 1
+                total_energy_count += count
+            elif card_type == "Trainer":
+                unique_trainer_count += 1
+                total_trainer_count += count
+            else:  # It's a Pokémon card
+                unique_pokemon_count += 1
+                total_pokemon_count += count
+
+    # Pass summary statistics to the template
+    return render_template('collection.html', username=username, collection=collection, all_cards=all_cards,
+                           unique_pokemon_count=unique_pokemon_count, total_pokemon_count=total_pokemon_count,
+                           unique_trainer_count=unique_trainer_count, total_trainer_count=total_trainer_count,
+                           unique_energy_count=unique_energy_count, total_energy_count=total_energy_count)
+
