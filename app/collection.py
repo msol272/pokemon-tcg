@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 import os
 import json
 
@@ -6,12 +6,13 @@ collection_bp = Blueprint('collection', __name__)
 
 @collection_bp.route('/user/<username>/collection', methods=['GET', 'POST'])
 def view_edit_collection(username):
-    users_dir = os.path.join(os.getcwd(), 'users')
+    users_dir = os.path.join(current_app.root_path, 'users')
+    print(users_dir)
     user_dir = os.path.join(users_dir, username)
 
     if not os.path.exists(user_dir):
         flash(f"User '{username}' does not exist.")
-        return redirect(url_for('home'))
+        return redirect(url_for('home.home'))
 
     # Load user's collection from a file or database (for now, using a mock structure)
     # For example, you can load a JSON file that stores the number of each card for the user.
@@ -37,7 +38,7 @@ def view_edit_collection(username):
 
     # Assume a list of all available Pokémon cards (could load from a global JSON file)
     try:
-        file_path = "app/static/pokemon_cards_data.json"
+        file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
         with open(file_path, 'r') as json_file:
             all_cards = json.load(json_file)["data"]
     except FileNotFoundError:

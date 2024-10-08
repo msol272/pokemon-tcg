@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 import os
 
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route('/new_user', methods=['GET', 'POST'])
 def new_user():
-    users_dir = os.path.join(os.getcwd(), 'users')
+    users_dir = os.path.join(current_app.root_path, 'users')
     
     if request.method == 'POST':
         new_username = request.form['username'].strip()
@@ -24,7 +24,7 @@ def new_user():
 
 @users_bp.route('/user/<username>')
 def user_page(username):
-    users_dir = os.path.join(os.getcwd(), 'users')
+    users_dir = os.path.join(current_app.root_path, 'users')
     user_dir = os.path.join(users_dir, username)
 
     if not os.path.exists(user_dir):
