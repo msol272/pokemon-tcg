@@ -2,12 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 import os
 import json
 
-collection_bp = Blueprint('collection', __name__)
+deck_bp = Blueprint('deck', __name__)
 
-@collection_bp.route('/user/<username>/collection', methods=['GET', 'POST'])
-def view_edit_collection(username):
+@deck_bp.route('/user/<username>/<deckname>', methods=['GET', 'POST'])
+def view_edit_deck(username, deckname):
     users_dir = os.path.join(current_app.root_path, 'users')
     user_dir = os.path.join(users_dir, username)
+
+    deck_dir = os.path.join(user_dir, 'decks', deckname)
 
     if not os.path.exists(user_dir):
         flash(f"User '{username}' does not exist.")
@@ -17,22 +19,34 @@ def view_edit_collection(username):
     # For example, you can load a JSON file that stores the number of each card for the user.
     collection_file = os.path.join(user_dir, 'collection.json')
     
+    # Load user's collection from a file or database (for now, using a mock structure)
+    # For example, you can load a JSON file that stores the number of each card for the user.
+    deck_file = os.path.join(deck_dir, 'deck.json')
+    
+
     if os.path.exists(collection_file):
         with open(collection_file, 'r') as file:
             collection = json.load(file)
     else:
         collection = {}
 
+    if os.path.exists(deck_file):
+        with open(deck_file, 'r') as file:
+            deck = json.load(file)
+    else:
+        deck = {}
+
+
     if request.method == 'POST':
-        # Handle updating the collection based on form submission
+        # Handle updating the deck based on form submission
         for card_number, count in request.form.items():
-            collection[card_number] = int(count)
+            deck[card_number] = int(count)
 
-        # Save the updated collection
-        with open(collection_file, 'w') as file:
-            json.dump(collection, file)
+        # Save the updated deck
+        with open(deck_file, 'w') as file:
+            json.dump(deck, file)
 
-        flash('Collection updated successfully!')
+        flash('deck updated successfully!')
         return redirect(url_for('users.user_page', username=username))
 
     # Assume a list of all available Pokémon cards (could load from a global JSON file)
@@ -45,9 +59,13 @@ def view_edit_collection(username):
     except json.JSONDecodeError:
         print("Error: The file contains invalid JSON.")
 
+    # Filter out only cards in the collection and add count field
+    all_cards = [card for card in all_cards if card['id'] in collection and collection[card['id']] > 0]
+    for card in all_cards:
+        card['count'] = collection[card['id']]
+
     # Sort the cards by ID before rendering
     all_cards = sorted(all_cards, key=lambda x: int(x['number']) + (1000 if x['supertype'] == "Energy" else 0))
-
 
     for card in all_cards:
         superType = card["supertype"]
@@ -69,7 +87,7 @@ def view_edit_collection(username):
 
     for card in all_cards:
         card_id = card["id"]
-        count = collection.get(card_id, 0)
+        count = deck.get(card_id, 0)
         card_type = card["cardtype"]
 
         if count > 0:
@@ -84,7 +102,7 @@ def view_edit_collection(username):
                 total_pokemon_count += count
 
     # Pass summary statistics to the template
-    return render_template('collection.html', username=username, collection=collection, all_cards=all_cards,
+    return render_template('deck.html', username=username, deckname=deckname, deck=deck, all_cards=all_cards,
                            unique_pokemon_count=unique_pokemon_count, total_pokemon_count=total_pokemon_count,
                            unique_trainer_count=unique_trainer_count, total_trainer_count=total_trainer_count,
                            unique_energy_count=unique_energy_count, total_energy_count=total_energy_count)

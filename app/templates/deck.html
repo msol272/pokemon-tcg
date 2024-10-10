@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ username }}'s Collection</title>
+    <title>{{ deckname }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
             transition: background-color 0.3s;
         }
         .highlight {
-            background-color: #FFD700;
+            background-color: #704700;
         }
         img {
             max-width: 100%;
@@ -50,7 +50,7 @@
         h1 {
             text-align: center;
         }
-        .save-collection {
+        .save-deck {
             position: absolute;
             top: 20px;
             right: 20px;
@@ -61,7 +61,7 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .save-collection:hover {
+        .save-deck:hover {
             background-color: #0056b3;
         }
         #search-bar {
@@ -170,14 +170,14 @@
 </head>
 <body>
 
-    <h1>{{ username }}'s Card Collection</h1>
+    <h1>{{ deckname }}</h1>
 
     <div style="text-align: center; margin-bottom: 20px;">
         <input type="text" id="search-bar" placeholder="Search for a card..." oninput="filterCards()">
         <select id="view-mode" onchange="filterCards()">
             <option value="all">All Cards</option>
-            <option value="owned">Owned Cards</option>
-            <option value="unowned">Unowned Cards</option>
+            <option value="indeck">In Deck</option>
+            <option value="available">Available</option>
         </select>
         <select id="card-type" onchange="filterCards()">
             <option value="All">All Types</option>
@@ -196,22 +196,26 @@
         </select>
     </div>
 
-    <form method="POST">
-        <button type="submit" class="save-collection">Save Collection</button>
+    <div id="error-message" style="color: red; display: none;"></div>
+
+
+    <form id="deck-form" method="POST" onsubmit="return validateDeck()">
+        <button type="submit" class="save-deck">Save Deck</button>
         <div class="container">
             <div class="grid">
                 {% for card in all_cards %}
-                <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}">
+                <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}" card-count="{{ card.count }}" card-id="{{ card.id }}">
                     <img src="{{ url_for('static', filename='images/' + card.id + '.jpg') }}" alt="{{ card.name }}" id="img-{{ card.id }}" onclick="openModal('{{ card.id }}')">
                     <div class="controls">
                         <button type="button" onclick="decreaseCount('{{ card.id }}')">-</button>
-                        <input type="text" name="{{ card.id }}" id="count-{{ card.id }}" value="{{ collection.get(card.id, 0) }}" readonly>
+                        <!-- Display count / total as a single field, but separate for easier modification -->
+                        <span id="count-{{ card.id }}">{{ deck.get(card.id, 0) }}</span> / <span id="total-{{ card.id }}">{{ card.count }}</span>
+                        <input type="hidden" name="{{ card.id }}" id="hidden-count-{{ card.id }}" value="{{ deck.get(card.id, 0) }}">
                         <button type="button" onclick="increaseCount('{{ card.id }}')">+</button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-
             <!-- Summary Panel -->
             <div class="summary-panel">
                 <h2>Summary</h2>
@@ -223,6 +227,7 @@
                 </ul>
             </div>
 
+            
             <!-- Modal structure -->
             <div id="modal" class="modal">
                 <span class="close" onclick="closeModal()">&times;</span>
@@ -246,8 +251,9 @@
 
             cards.forEach(card => {
                 const cardType = card.getAttribute('card-type');
-                const input = card.querySelector('input[type="text"]');
-                const count = parseInt(input.value) || 0;
+                const cardId = card.getAttribute('card-id');
+                let countElement = document.getElementById(`count-${cardId}`);
+                const count = parseInt(countElement.innerText) || 0;
 
                 if (count > 0) {
                     if (cardType === 'Energy') {
@@ -270,38 +276,60 @@
             summaryPanel.querySelector('ul li:nth-child(3)').innerText = `Energy: ${totalEnergyCount} (${uniqueEnergyCount} unique)`;
             summaryPanel.querySelector('ul li:last-child strong').innerText = `Total: ${totalPokemonCount + totalTrainerCount + totalEnergyCount} (${uniquePokemonCount + uniqueTrainerCount + uniqueEnergyCount} unique)`;
         }
-        function increaseCount(cardNumber) {
-            const input = document.getElementById(`count-${cardNumber}`);
-            const card = document.getElementById(`card-${cardNumber}`);
-            let currentValue = parseInt(input.value) || 0;
-            input.value = currentValue + 1;
 
-            if (currentValue + 1 > 0) {
+        function updateHiddenInput(cardId) {
+            const countSpan = document.getElementById(`count-${cardId}`);
+            const hiddenInput = document.getElementById(`hidden-count-${cardId}`);
+            const count = countSpan.innerText; // Extract the current count
+            hiddenInput.value = count; // Update hidden input value
+        }
+
+
+        function increaseCount(cardNumber) {
+            const card = document.getElementById(`card-${cardNumber}`);
+
+            let countElement = document.getElementById(`count-${cardNumber}`);
+            let totalElement = document.getElementById(`total-${cardNumber}`);
+            
+            let currentCount = parseInt(countElement.innerText);
+            let totalCount = parseInt(totalElement.innerText);
+
+            // Only increase if current count is less than total available
+            if (currentCount < totalCount) {
+                countElement.innerText = currentCount + 1;
+                updateHiddenInput(cardNumber); // Sync with hidden input
+            }
+            if (currentCount + 1 > 0) {
                 card.classList.add('highlight');
             }
             updateSummary();
         }
 
         function decreaseCount(cardNumber) {
-            const input = document.getElementById(`count-${cardNumber}`);
             const card = document.getElementById(`card-${cardNumber}`);
-            let currentValue = parseInt(input.value) || 0;
 
-            if (currentValue > 0) {
-                input.value = currentValue - 1;
+            let countElement = document.getElementById(`count-${cardNumber}`);
+            
+            let currentCount = parseInt(countElement.innerText);
+            
+            // Only decrease if current count is greater than zero
+            if (currentCount > 0) {
+                countElement.innerText = currentCount - 1;
+                updateHiddenInput(cardNumber); // Sync with hidden input
             }
-
-            if (currentValue - 1 <= 0) {
+            if (currentCount - 1 <= 0) {
                 card.classList.remove('highlight');
             }
             updateSummary();
         }
 
         // Initialize highlight for cards that already have a count > 0
-        document.querySelectorAll('input[type="text"]').forEach(function(input) {
-            const cardNumber = input.name;
+        document.querySelectorAll('span[id^="count-"]').forEach(function(span) {
+            const cardNumber = span.id.replace('count-', ''); // Get the card ID from the span's ID
             const card = document.getElementById(`card-${cardNumber}`);
-            if (parseInt(input.value) > 0) {
+            const count = parseInt(span.innerText);
+
+            if (count > 0) {
                 card.classList.add('highlight');
             }
         });
@@ -315,17 +343,21 @@
 
             cards.forEach(card => {
                 const cardName = card.querySelector('img').alt.toLowerCase();
-                const count = parseInt(card.querySelector('input[type="text"]').value) || 0;
+                const cardId = card.getAttribute('card-id');
+                let countElement = document.getElementById(`count-${cardId}`);
+                let totalElement = document.getElementById(`total-${cardId}`);
+                const count = parseInt(countElement.innerText) || 0;
+                const total = parseInt(totalElement.innerText) || 0;
                 const cardType = card.getAttribute('card-type');
 
                 // Check if card matches the search query
                 const matchesQuery = cardName.includes(query);
 
-                // Check if card matches the view mode (all, owned, unowned)
+                // Check if card matches the view mode (all, indeck, notindeck)
                 let matchesViewMode = true;
-                if (viewMode === 'owned' && count === 0) {
+                if (viewMode === 'indeck' && count === 0) {
                     matchesViewMode = false;
-                } else if (viewMode === 'unowned' && count > 0) {
+                } else if (viewMode === 'available' && count >= total) {
                     matchesViewMode = false;
                 }
 
@@ -344,6 +376,29 @@
                     card.style.display = 'none';
                 }
             });
+        }
+
+        function validateDeck() {
+            let totalCards = 0;
+
+            // Loop through all hidden inputs (which contain the counts)
+            document.querySelectorAll('input[type="hidden"]').forEach(function(input) {
+                totalCards += parseInt(input.value); // Add up the card counts
+            });
+
+            // Check if the total number of cards is exactly 60
+            if (totalCards !== 60) {
+                const errorMessage = document.getElementById('error-message');
+                if (totalCards < 60) {
+                    errorMessage.textContent = `Too few cards! Your deck has ${totalCards} cards. You need 60.`;
+                } else {
+                    errorMessage.textContent = `Too many cards! Your deck has ${totalCards} cards. You need 60.`;
+                }
+                errorMessage.style.display = 'block'; // Show error message
+                return false; // Prevent form submission
+            }
+
+            return true; // Allow form submission if deck is exactly 60 cards
         }
 
         function openModal(cardNumber) {

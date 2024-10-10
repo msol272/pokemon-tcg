@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Deck</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #cccccc;
+        }
+        .pane {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            width: 50%;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #3a3a3a;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        .error {
+            color: red;
+        }        
+    </style>
+</head>
+<body>
+    <h1>Create New Deck</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="error">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+    <div class="pane">
+        <form method="POST">
+            <label for="deck_name">Enter Deck Name:</label><br>
+            <input type="text" name="deck_name" id="deck_name" required><br>
+            <button type="submit">Create Deck</button>
+        </form>
+    </div>
+
+    <br><br>
+    <a href="{{ url_for('users.user_page', username=username) }}" style="color: #ffffff">Back to User Page</a>
+</body>
+</html>
