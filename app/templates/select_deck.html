@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Deck - Join Seat 1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #cccccc;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .deck-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .deck-list button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select a Deck for {{ username }} - Join Seat {{ seat }}</h1>
+
+    <div class="container">
+        <div class="deck-list">
+            {% for deck in decks %}
+                <a href="{{ url_for('game.board', deck=deck, username=username, seat=seat) }}">
+                    <button>{{ deck }}</button>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br><br>
+    <a href="{{ url_for('home.select_user') }}" style="color: #ffffff">Back to User Selection</a>
+</body>
+</html>

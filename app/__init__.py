@@ -3,6 +3,7 @@ from app.home import home_bp
 from app.users import users_bp
 from app.collection import collection_bp
 from app.deck import deck_bp
+from app.game import game_bp
 
 def create_app():
     app = Flask(__name__)
@@ -13,5 +14,6 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(collection_bp)
     app.register_blueprint(deck_bp)
+    app.register_blueprint(game_bp)
 
     return app

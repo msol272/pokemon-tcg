@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Board</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .gameboard {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .area {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-template-rows: repeat(1, 1fr);
+            gap: 10px;
+            width: 90%;
+        }
+        .seat2-bench-area {
+            height: calc(25% - 5px);
+            order: 1;
+        } 
+
+        .seat2-active-area {
+            height: calc(25% - 5px);
+            order: 2;
+        } 
+
+        .seat1-active-area {
+            height: calc(25% - 5px);
+            order: 4;
+        } 
+
+        .seat1-bench-area {
+            height: calc(25% - 5px);
+            order: 5;
+        } 
+
+        .middle-line {
+            width: 100%;
+            border-top: 2px solid #cccccc;
+            order: 3;
+        }
+        .grid-cell {
+            background-color: #303030;
+            border: 1px solid #cccccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            cursor: pointer;
+        }
+        .empty-cell {
+            background-color: transparent;
+        }
+
+        .selected-red {
+            border: 3px solid red;
+        }
+
+        .selected-blue {
+            border: 3px solid blue;
+        }
+
+        /* CSS for flipping the gameboard based on the seat */
+        .flip-layout .seat1-bench-area {
+            order: 1;
+        }
+        .flip-layout .seat1-active-area {
+            order: 2;
+        }
+        .flip-layout .seat2-active-area {
+            order: 4;
+        }
+        .flip-layout .seat2-bench-area {
+            order: 5; 
+        }
+
+        /* Reverse rows within each area when seat=2 */
+        .reverse-rows .area {
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Gameboard -->
+<div class="gameboard" id="gameboard">
+    <div class="area seat2-bench-area">
+        <div class="grid-cell" id="seat2-hand">Hand</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-b1">Bench</div>
+        <div class="grid-cell" id="seat2-b2">Bench</div>
+        <div class="grid-cell" id="seat2-b3">Bench</div>
+        <div class="grid-cell" id="seat2-b4">Bench</div>
+        <div class="grid-cell" id="seat2-b5">Bench</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-discard">Discard</div>
+    </div>
+
+    <div class="area seat2-active-area">
+        <div class="grid-cell" id="seat2-prizes">Prizes</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-spare1">Spare</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-active">Active</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-spare2">Spare</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat2-deck">Deck</div>
+    </div>
+
+    <div class="middle-line"></div>
+
+    <div class="area seat1-active-area">
+        <div class="grid-cell" id="seat1-prizes">Prizes</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-spare1">Spare</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-active">Active</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-spare2">Spare</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-deck">Deck</div>
+    </div>
+    <div class="area seat1-bench-area">
+        <div class="grid-cell" id="seat1-hand">Hand</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-b1">Bench</div>
+        <div class="grid-cell" id="seat1-b2">Bench</div>
+        <div class="grid-cell" id="seat1-b3">Bench</div>
+        <div class="grid-cell" id="seat1-b4">Bench</div>
+        <div class="grid-cell" id="seat1-b5">Bench</div>
+        <div class="empty-cell"></div>
+        <div class="grid-cell" id="seat1-discard">Discard</div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    var socket = io();
+
+    let gameboard = document.getElementById('gameboard');
+    let currentSelectedCell1 = null;
+    let currentSelectedCell2 = null;
+
+    // If seat is 2, flip the layout so seat2 is on the bottom
+    if ({{seat}} === '2') {
+        gameboard.classList.add('flip-layout');
+    }
+
+    // Card selection and movement logic
+    document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            if (!this.classList.contains('empty-cell')) {
+                // Clear previous selection
+                if ({{seat}} === '1') {
+                    if (currentSelectedCell1) {
+                        currentSelectedCell1.classList.remove('selected-red');
+                    }
+
+                    // Add selected border based on seat
+                    this.classList.add('selected-red');
+    
+                    // Store the selected cell
+                    currentSelectedCell1 = this;
+                } else {
+                    if (currentSelectedCell2) {
+                        currentSelectedCell2.classList.remove('selected-blue');
+                    }
+
+                    // Add selected border based on seat
+                    this.classList.add('selected-blue');
+    
+                    // Store the selected cell
+                    currentSelectedCell2 = this;
+                }
+
+
+
+                // Send the selection to the server via WebSocket
+                socket.emit('card_selected', {
+                    seat: {{seat}},
+                    cardId: this.id
+                });
+            }
+        });
+    });
+
+    // Listen for updates from the server for card selection
+    socket.on('update_card_selection', function(data) {
+        // Remove the current selection highlight (if any)
+        if (data.seat === '1') {
+            if (currentSelectedCell1) {
+                currentSelectedCell1.classList.remove('selected-red');
+            }
+    
+            // Get the new card by its ID
+            let newSelectedCell = document.getElementById(data.cardId);
+            newSelectedCell.classList.add('selected-red');
+    
+            // Update the current selected cell
+            currentSelectedCell1 = newSelectedCell;
+        } else {
+            if (currentSelectedCell2) {
+                currentSelectedCell2.classList.remove('selected-blue');
+            }
+    
+            // Get the new card by its ID
+            let newSelectedCell = document.getElementById(data.cardId);
+            newSelectedCell.classList.add('selected-blue');
+    
+            // Update the current selected cell
+            currentSelectedCell2 = newSelectedCell;
+        }
+    });
+</script>
+</body>
+</html>

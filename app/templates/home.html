@@ -74,8 +74,8 @@
         <!-- Play a Game Pane -->
         <div class="pane">
             <h2>Play a Game</h2>
-            <button class="join-seat1-btn">Join in Seat 1</button>
-            <button class="join-seat2-btn">Join in Seat 2</button>
+            <button class="join-seat1-btn" onclick="window.location.href='{{ url_for('home.select_user', seat=1) }}'">Join in Seat 1</button>
+            <button class="join-seat2-btn" onclick="window.location.href='{{ url_for('home.select_user', seat=2) }}'">Join in Seat 2</button>
         </div>
     </div>
 </body>
