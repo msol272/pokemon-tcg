@@ -13,13 +13,12 @@ def board():
     username = request.args.get('username')
     deckname = request.args.get('deck')
 
-    # Assume a list of all available Pokémon cards (could load from a global JSON file)
+    # Load all available Pokémon cards
     file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
     with open(file_path, 'r') as json_file:
         all_cards = json.load(json_file)["data"]
 
-    # Load user's collection from a file or database (for now, using a mock structure)
-    # For example, you can load a JSON file that stores the number of each card for the user.
+    # Load user's deck
     users_dir = os.path.join(current_app.root_path, 'users')
     user_dir = os.path.join(users_dir, username)
     deck_dir = os.path.join(user_dir, 'decks', deckname)
@@ -27,9 +26,10 @@ def board():
     with open(deck_file, 'r') as file:
         deck = json.load(file)
 
-    all_cards = [card for card in all_cards if card['id'] in deck and deck[card['id']] > 0]
+    # Filter the cards that are in the deck
+    user_cards = [card for card in all_cards if card['id'] in deck and deck[card['id']] > 0]
 
-    return render_template('gameboard.html', seat=seat, all_cards=all_cards)
+    return render_template('gameboard.html', seat=seat, all_cards=user_cards)
 
 # SocketIO event for handling real-time updates
 def register_socketio_events(socketio):
@@ -37,3 +37,11 @@ def register_socketio_events(socketio):
     def handle_card_selected(data):
         # Broadcast the card selection to all clients except the sender
         emit('update_card_selection', data, broadcast=True)
+    
+    @socketio.on('deck_selected')
+    def handle_deck_selected(data):
+        # Mock card image paths (or use the actual ones you loaded earlier)
+        card_images = [{'id': card["id"]} for card in data["all_cards"]]
+
+        # Send the card images back to the client
+        emit('display_deck_cards', {'cards': card_images}, broadcast=False)

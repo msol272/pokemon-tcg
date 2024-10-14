@@ -11,81 +11,137 @@
             padding: 0;
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             justify-content: center;
             align-items: center;
         }
-        .gameboard {
-            position: relative;
+
+        /* Wrapper that contains side panels and gameboard */
+        .gameboard-wrapper {
+            display: flex;
             width: 100%;
+            height: 100%;
+        }
+
+        /* Left panel styles */
+        .left-panel {
+            width: 200px;
+            background-color: #2e2e2e;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
+            align-items: center;
+            color: white;
+            padding: 10px;
         }
+
+        .right-panel {
+            width: 200px;
+            background-color: #2e2e2e;
+            height: 700px; /* Match gameboard height */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            color: white;
+            padding: 10px;
+            overflow-y: auto; /* Enable scrolling */
+        }
+
+        /* Scrollable gameboard container */
+        .gameboard-container {
+            flex-grow: 0;
+            display: flex;
+            height: 100%;
+            overflow: auto; /* Enables scrolling */
+        }
+
+        /* Gameboard styling with constant size */
+        .gameboard {
+            position: relative;
+            width: 1200px; /* Constant width */
+            height: 700px; /* Constant height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Space out sections evenly */
+            align-items: center;
+        }
+
         .area {
             display: grid;
             grid-template-columns: repeat(9, 1fr);
             grid-template-rows: repeat(1, 1fr);
-            gap: 10px;
+            gap: 5px;
             width: 90%;
         }
+
         .seat2-bench-area {
             height: calc(25% - 5px);
             order: 1;
-        } 
+        }
 
         .seat2-active-area {
             height: calc(25% - 5px);
             order: 2;
-        } 
+        }
 
         .seat1-active-area {
             height: calc(25% - 5px);
             order: 4;
-        } 
+        }
 
         .seat1-bench-area {
             height: calc(25% - 5px);
             order: 5;
-        } 
+        }
 
         .middle-line {
             width: 100%;
             border-top: 2px solid #cccccc;
+            margin: 20px 0; /* Adds vertical space around the middle line */
             order: 3;
         }
+
         .grid-cell {
             background-color: #303030;
-            border: 1px solid #cccccc;
+            border: 2px solid #cccccc;
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
             cursor: pointer;
+            width: 100px; /* Constant width */
+            height: 150px; /* Constant height */
         }
+
         .empty-cell {
             background-color: transparent;
+            width: 104px; /* Constant width */
+            height: 154px; /* Constant height */
         }
 
         .selected-red {
-            border: 3px solid red;
+            border: 2px solid red;
         }
 
         .selected-blue {
-            border: 3px solid blue;
+            border: 2px solid blue;
         }
 
         /* CSS for flipping the gameboard based on the seat */
         .flip-layout .seat1-bench-area {
             order: 1;
         }
+
         .flip-layout .seat1-active-area {
             order: 2;
         }
+
         .flip-layout .seat2-active-area {
             order: 4;
         }
+
         .flip-layout .seat2-bench-area {
             order: 5; 
         }
@@ -96,60 +152,170 @@
             flex-direction: column-reverse;
         }
 
+        /* Text status styles */
+        .status-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .status-your-turn {
+            color: red;
+        }
+
+        .status-opponent-turn,
+        .status-setup {
+            color: white;
+        }
+
+        /* Button styles */
+        .game-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .end-turn {
+            background-color: #ff4c4c;
+            color: white;
+        }
+
+        .ready-button {
+            background-color: #00bfff;
+            color: white;
+        }
+
+        .disabled-button {
+            background-color: #555555;
+            color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* History box styles */
+        .history-box {
+            width: 100%;
+            height: 60%;
+            background-color: #404040;
+            border: 1px solid #cccccc;
+            color: #ffffff;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* New Game button */
+        .new-game-button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .deck-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card-image {
+            width: 100px;
+            height: 150px;
+            margin: 10px;
+        }
     </style>
 </head>
 <body>
 
-<!-- Gameboard -->
-<div class="gameboard" id="gameboard">
-    <div class="area seat2-bench-area">
-        <div class="grid-cell" id="seat2-hand">Hand</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-b1">Bench</div>
-        <div class="grid-cell" id="seat2-b2">Bench</div>
-        <div class="grid-cell" id="seat2-b3">Bench</div>
-        <div class="grid-cell" id="seat2-b4">Bench</div>
-        <div class="grid-cell" id="seat2-b5">Bench</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-discard">Discard</div>
+<!-- Main wrapper -->
+<div class="gameboard-wrapper">
+
+    <!-- Left panel with elements -->
+    <div class="left-panel">
+        <!-- Status text -->
+        <div class="status-text status-setup" id="statusText">Setup</div>
+
+        <!-- Dynamic button -->
+        <button class="game-button disabled-button" id="actionButton" disabled>Ready</button>
+
+        <!-- Scrollable history box -->
+        <div class="history-box" id="historyBox">
+            Game log will appear here...
+        </div>
+
+        <!-- New Game button -->
+        <button class="new-game-button" id="newGameButton">New Game</button>
     </div>
 
-    <div class="area seat2-active-area">
-        <div class="grid-cell" id="seat2-prizes">Prizes</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-spare1">Spare</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-active">Active</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-spare2">Spare</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat2-deck">Deck</div>
+    <!-- Gameboard container (scrollable) -->
+    <div class="gameboard-container">
+        <div class="gameboard" id="gameboard">
+            <div class="area seat2-bench-area">
+                <div class="grid-cell" id="seat2-hand">Hand</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-b1">Bench</div>
+                <div class="grid-cell" id="seat2-b2">Bench</div>
+                <div class="grid-cell" id="seat2-b3">Bench</div>
+                <div class="grid-cell" id="seat2-b4">Bench</div>
+                <div class="grid-cell" id="seat2-b5">Bench</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-discard">Discard</div>
+            </div>
+
+            <div class="area seat2-active-area">
+                <div class="grid-cell" id="seat2-prizes">Prizes</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-spare1">Spare</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-active">Active</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-spare2">Spare</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat2-deck">
+                    <img src="/static/images/back.jpg" alt="Deck" id="seat2-deck-img" class="deck-image">
+                </div>
+            </div>
+
+            <div class="middle-line"></div>
+
+            <div class="area seat1-active-area">
+                <div class="grid-cell" id="seat1-prizes">Prizes</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-spare1">Spare</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-active">Active</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-spare2">Spare</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-deck">
+                    <img src="/static/images/back.jpg" alt="Deck" id="seat1-deck-img" class="deck-image">
+                </div>
+            </div>
+
+            <div class="area seat1-bench-area">
+                <div class="grid-cell" id="seat1-hand">Hand</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-b1">Bench</div>
+                <div class="grid-cell" id="seat1-b2">Bench</div>
+                <div class="grid-cell" id="seat1-b3">Bench</div>
+                <div class="grid-cell" id="seat1-b4">Bench</div>
+                <div class="grid-cell" id="seat1-b5">Bench</div>
+                <div class="empty-cell"></div>
+                <div class="grid-cell" id="seat1-discard">Discard</div>
+            </div>
+        </div>
     </div>
 
-    <div class="middle-line"></div>
+    <!-- Right panel -->
+    <div class="right-panel">
+        Right Panel
+    </div>
 
-    <div class="area seat1-active-area">
-        <div class="grid-cell" id="seat1-prizes">Prizes</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-spare1">Spare</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-active">Active</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-spare2">Spare</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-deck">Deck</div>
-    </div>
-    <div class="area seat1-bench-area">
-        <div class="grid-cell" id="seat1-hand">Hand</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-b1">Bench</div>
-        <div class="grid-cell" id="seat1-b2">Bench</div>
-        <div class="grid-cell" id="seat1-b3">Bench</div>
-        <div class="grid-cell" id="seat1-b4">Bench</div>
-        <div class="grid-cell" id="seat1-b5">Bench</div>
-        <div class="empty-cell"></div>
-        <div class="grid-cell" id="seat1-discard">Discard</div>
-    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
@@ -192,8 +358,6 @@
                     currentSelectedCell2 = this;
                 }
 
-
-
                 // Send the selection to the server via WebSocket
                 socket.emit('card_selected', {
                     seat: {{seat}},
@@ -206,30 +370,115 @@
     // Listen for updates from the server for card selection
     socket.on('update_card_selection', function(data) {
         // Remove the current selection highlight (if any)
-        if (data.seat === '1') {
-            if (currentSelectedCell1) {
-                currentSelectedCell1.classList.remove('selected-red');
+        if (data.seat === 1 && currentSelectedCell1) {
+            currentSelectedCell1.classList.remove('selected-red');
+        } else if (data.seat === 2 && currentSelectedCell2) {
+            currentSelectedCell2.classList.remove('selected-blue');
+        }
+
+        // Find the new selected cell and highlight it
+        let selectedCell = document.getElementById(data.cardId);
+        if (selectedCell) {
+            if (data.seat === 1) {
+                selectedCell.classList.add('selected-red');
+                currentSelectedCell1 = selectedCell;
+            } else {
+                selectedCell.classList.add('selected-blue');
+                currentSelectedCell2 = selectedCell;
             }
-    
-            // Get the new card by its ID
-            let newSelectedCell = document.getElementById(data.cardId);
-            newSelectedCell.classList.add('selected-red');
-    
-            // Update the current selected cell
-            currentSelectedCell1 = newSelectedCell;
-        } else {
-            if (currentSelectedCell2) {
-                currentSelectedCell2.classList.remove('selected-blue');
-            }
-    
-            // Get the new card by its ID
-            let newSelectedCell = document.getElementById(data.cardId);
-            newSelectedCell.classList.add('selected-blue');
-    
-            // Update the current selected cell
-            currentSelectedCell2 = newSelectedCell;
         }
     });
+
+    let statusText = document.getElementById("statusText");
+    let actionButton = document.getElementById("actionButton");
+    let historyBox = document.getElementById("historyBox");
+
+    // Example of dynamically changing status and button states
+    function updateGameState(state) {
+        if (state === 'your_turn') {
+            statusText.textContent = "Your Turn";
+            statusText.classList.add('status-your-turn');
+            statusText.classList.remove('status-opponent-turn', 'status-setup');
+            actionButton.textContent = "End Turn";
+            actionButton.classList.remove('disabled-button');
+            actionButton.classList.add('end-turn');
+            actionButton.disabled = false;
+        } else if (state === 'opponents_turn') {
+            statusText.textContent = "Opponents Turn";
+            statusText.classList.add('status-opponent-turn');
+            statusText.classList.remove('status-your-turn', 'status-setup');
+            actionButton.textContent = "End Turn";
+            actionButton.classList.add('disabled-button');
+            actionButton.classList.remove('end-turn');
+            actionButton.disabled = true;
+        } else if (state === 'setup') {
+            statusText.textContent = "Setup";
+            statusText.classList.add('status-setup');
+            statusText.classList.remove('status-your-turn', 'status-opponent-turn');
+            actionButton.textContent = "Ready";
+            actionButton.classList.remove('disabled-button');
+            actionButton.classList.add('ready-button');
+            actionButton.disabled = false;
+        }
+    }
+
+    // Add history log
+    function addHistoryMessage(message) {
+        const log = document.createElement('div');
+        log.textContent = message;
+        historyBox.appendChild(log);
+        historyBox.scrollTop = historyBox.scrollHeight; // Auto-scroll to bottom
+    }
+
+    // Button events
+    actionButton.addEventListener('click', function() {
+        if (actionButton.textContent === "Ready") {
+            socket.emit('ready');
+        } else if (actionButton.textContent === "End Turn") {
+            socket.emit('end_turn');
+        }
+    });
+
+    document.getElementById("newGameButton").addEventListener('click', function() {
+        socket.emit('new_game');
+    });
+
+    // Example socket event listeners
+    socket.on('game_state_change', function(state) {
+        updateGameState(state);
+    });
+
+    socket.on('action_log', function(message) {
+        addHistoryMessage(message);
+    });
+
+    // Reference to right panel where cards will be displayed
+    let rightPanel = document.querySelector('.right-panel');
+    let allCards =  {{ all_cards | tojson }};
+
+    // Handle deck click to display card images
+    document.getElementById('seat1-deck-img').addEventListener('click', function() {
+        socket.emit('deck_selected', { seat: 1, all_cards: allCards });
+    });
+
+    document.getElementById('seat2-deck-img').addEventListener('click', function() {
+        socket.emit('deck_selected', { seat: 2, all_cards: allCards });
+    });
+
+    // Listen for card deck images update from the server
+    socket.on('display_deck_cards', function(data) {
+        // Clear the right panel first
+        rightPanel.innerHTML = '';
+
+        // Loop through the card images and add them to the right panel
+        data.cards.forEach(function(card) {
+            let cardImg = document.createElement('img');
+            cardImg.src = `/static/images/${card.id}.jpg`;
+            cardImg.classList.add('card-image');
+            rightPanel.appendChild(cardImg);
+        });
+    });
 </script>
+
 </body>
 </html>
