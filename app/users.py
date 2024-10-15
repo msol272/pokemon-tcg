@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 import os
+import json
 
 users_bp = Blueprint('users', __name__)
 
@@ -40,6 +41,7 @@ def user_page(username):
 
     return render_template('user.html', username=username, decks=decks)
 
+
 @users_bp.route('/user/<username>/create_deck', methods=['GET', 'POST'])
 def create_deck(username):
     users_dir = os.path.join(current_app.root_path, 'users')
@@ -59,12 +61,28 @@ def create_deck(username):
             flash(f'Deck "{new_deck_name}" already exists. Please choose another name.', 'error')
             return redirect(url_for('users.create_deck', username=username))
 
-        # Create the new deck
+        # Create the new deck directory
         os.makedirs(new_deck_path)
+
+        # Capture checkbox states
+        settings = {
+            'unlimited_energy': 'unlimited_energy' in request.form,
+            'unlimited_dupes': 'unlimited_dupes' in request.form,
+            'unlimited_evolvers': 'unlimited_evolvers' in request.form,
+            'unlimited_cards': 'unlimited_cards' in request.form
+        }
+
+        # Write settings to a JSON file in the deck directory
+        settings_file = os.path.join(new_deck_path, 'settings.json')
+        with open(settings_file, 'w') as f:
+            json.dump(settings, f, indent=4)
+
         flash(f'Deck "{new_deck_name}" created successfully.')
+
         return redirect(url_for('deck.view_edit_deck', username=username, deckname=new_deck_name))
 
     return render_template('create_deck.html', username=username)
+
 
 @users_bp.route('/user/<username>/rename_deck', methods=['POST'])
 def rename_deck(username):
@@ -100,9 +118,12 @@ def delete_deck(username):
 
     if os.path.exists(deck_path):
         # Delete the directory and its contents
-        json_file = os.path.join(deck_path, "deck.json")
-        if os.path.exists(json_file):
-            os.remove(os.path.join(deck_path, "deck.json"))  # If the directory is empty
+        deck_file = os.path.join(deck_path, "deck.json")
+        settings_file = os.path.join(deck_path, "settings.json")
+        if os.path.exists(deck_file):
+            os.remove(deck_file)
+        if os.path.exists(settings_file):
+            os.remove(settings_file)
         os.rmdir(deck_path)  # If the directory is empty
         flash(f'Deck "{deck_name}" deleted successfully.')
     else:

@@ -28,6 +28,9 @@
             background-color: #3a3a3a;
             color: white;
         }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
         button {
             padding: 10px 20px;
             margin-top: 10px;
@@ -43,7 +46,43 @@
         }
         .error {
             color: red;
-        }        
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            color: #28a745;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            white-space: nowrap; /* Forces the tooltip text to stay on one line */
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the tooltip text */
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .left-justified {
+            text-align: left;
+            margin: 0 auto;
+            width: 80%;
+        }
+        label.settings-title {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -57,6 +96,40 @@
         <form method="POST">
             <label for="deck_name">Enter Deck Name:</label><br>
             <input type="text" name="deck_name" id="deck_name" required><br>
+
+            <!-- Left-justified checkboxes with a Settings label -->
+            <div class="left-justified">
+                <label class="settings-title">Settings:</label>
+
+                <label>
+                    <input type="checkbox" name="unlimited_energy" id="unlimited_energy">
+                    <span class="tooltip">Unlimited Energy
+                        <span class="tooltiptext">Allow unlimited energy cards in the deck, even if you don't own that many.</span>
+                    </span>
+                </label><br>
+
+                <label>
+                    <input type="checkbox" name="unlimited_dupes" id="unlimited_dupes">
+                    <span class="tooltip">Unlimited Dupes
+                        <span class="tooltiptext">Allow unlimited copies of cards you own in the deck, even if you only own one.</span>
+                    </span>
+                </label><br>
+
+                <label>
+                    <input type="checkbox" name="unlimited_evolvers" id="unlimited_evolvers">
+                    <span class="tooltip">Unlimited Evolvers
+                        <span class="tooltiptext">Allow unlimited copies of Pokémon cards that evolve into cards you own.</span>
+                    </span>
+                </label><br>
+
+                <label>
+                    <input type="checkbox" name="unlimited_cards" id="unlimited_cards">
+                    <span class="tooltip">Unlimited Cards
+                        <span class="tooltiptext">Allow any cards from the entire Pokémon card set, even if you don't own them.</span>
+                    </span>
+                </label><br>
+            </div>
+
             <button type="submit">Create Deck</button>
         </form>
     </div>

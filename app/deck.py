@@ -8,22 +8,12 @@ deck_bp = Blueprint('deck', __name__)
 def view_edit_deck(username, deckname):
     users_dir = os.path.join(current_app.root_path, 'users')
     user_dir = os.path.join(users_dir, username)
-
     deck_dir = os.path.join(user_dir, 'decks', deckname)
 
-    if not os.path.exists(user_dir):
-        flash(f"User '{username}' does not exist.")
-        return redirect(url_for('home.home'))
-
-    # Load user's collection from a file or database (for now, using a mock structure)
-    # For example, you can load a JSON file that stores the number of each card for the user.
     collection_file = os.path.join(user_dir, 'collection.json')
-    
-    # Load user's collection from a file or database (for now, using a mock structure)
-    # For example, you can load a JSON file that stores the number of each card for the user.
     deck_file = os.path.join(deck_dir, 'deck.json')
+    settings_file =  os.path.join(deck_dir, 'settings.json')
     
-
     if os.path.exists(collection_file):
         with open(collection_file, 'r') as file:
             collection = json.load(file)
@@ -35,6 +25,17 @@ def view_edit_deck(username, deckname):
             deck = json.load(file)
     else:
         deck = {}
+
+    if os.path.exists(settings_file):
+        with open(settings_file, 'r') as file:
+            settings = json.load(file)
+    else:
+        settings = {
+            "unlimited_energy": False, 
+            "unlimited_dupes": False, 
+            "unlimited_evolvers": False, 
+            "unlimited_cards": False, 
+        }
 
 
     if request.method == 'POST':
@@ -49,25 +50,30 @@ def view_edit_deck(username, deckname):
         flash('deck updated successfully!')
         return redirect(url_for('users.user_page', username=username))
 
-    # Assume a list of all available Pokémon cards (could load from a global JSON file)
-    try:
-        file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
-        with open(file_path, 'r') as json_file:
-            all_cards = json.load(json_file)["data"]
-    except FileNotFoundError:
-        print(f"Error: The file '{file_path}' was not found.")
-    except json.JSONDecodeError:
-        print("Error: The file contains invalid JSON.")
+    # Load a list of all available pokemon
+    file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
+    with open(file_path, 'r') as json_file:
+        all_cards = json.load(json_file)["data"]
 
-    # Filter out only cards in the collection and add count field
-    all_cards = [card for card in all_cards if card['id'] in collection and collection[card['id']] > 0]
+    # Create a list of pokemon that evolve into cards you own
+    evolver_names = []
+    if settings["unlimited_evolvers"]:
+        # First pass - direct evolvers
+        for card in all_cards:
+            if card['id'] in collection and collection[card["id"]] > 0:
+                if "evolvesFrom" in card:
+                    evolver_names.append(card["evolvesFrom"])
+        # Second pass - evolvers of evolvers
+        for card in all_cards:
+            if card["name"] in evolver_names:
+                if "evolvesFrom" in card:
+                    evolver_names.append(card["evolvesFrom"])   
+
+    # Created filtered list of cards to display based on settings
+    filtered_cards = []
+
     for card in all_cards:
-        card['count'] = collection[card['id']]
-
-    # Sort the cards by ID before rendering
-    all_cards = sorted(all_cards, key=lambda x: int(x['number']) + (1000 if x['supertype'] == "Energy" else 0))
-
-    for card in all_cards:
+        # Set card type
         superType = card["supertype"]
         if superType == "Trainer":
             cardType = "Trainer"
@@ -77,6 +83,38 @@ def view_edit_deck(username, deckname):
             cardType = card["types"][0]
         card["cardtype"] = cardType
 
+        if settings["unlimited_cards"]:
+            if cardType == "Energy":
+                card["count"] = 60
+            else:
+                card["count"] = 4
+            filtered_cards.append(card)
+        elif settings["unlimited_energy"] and cardType == "Energy":
+            card["count"] = 60
+            filtered_cards.append(card)
+        else:
+            if card["name"] in evolver_names:
+                if cardType == "Energy":
+                    card["count"] = 60
+                else:
+                    card["count"] = 4   
+                filtered_cards.append(card)
+            elif card['id'] in collection and collection[card["id"]] > 0:
+                if settings["unlimited_dupes"]:
+                    if cardType == "Energy":
+                        card["count"] = 60
+                    else:
+                        card["count"] = 4   
+                else:
+                    if cardType == "Energy":
+                        card["count"] = collection[card["id"]]
+                    else:
+                        card["count"] = min(4, collection[card["id"]])
+                filtered_cards.append(card)
+            
+    # Sort the cards by ID before rendering
+    filtered_cards = sorted(filtered_cards, key=lambda x: int(x['number']) + (1000 if x['supertype'] == "Energy" else 0))
+
     # Calculate summary statistics
     unique_pokemon_count = 0
     total_pokemon_count = 0
@@ -85,7 +123,7 @@ def view_edit_deck(username, deckname):
     unique_energy_count = 0
     total_energy_count = 0
 
-    for card in all_cards:
+    for card in filtered_cards:
         card_id = card["id"]
         count = deck.get(card_id, 0)
         card_type = card["cardtype"]
@@ -102,7 +140,7 @@ def view_edit_deck(username, deckname):
                 total_pokemon_count += count
 
     # Pass summary statistics to the template
-    return render_template('deck.html', username=username, deckname=deckname, deck=deck, all_cards=all_cards,
+    return render_template('deck.html', username=username, deckname=deckname, deck=deck, all_cards=filtered_cards,
                            unique_pokemon_count=unique_pokemon_count, total_pokemon_count=total_pokemon_count,
                            unique_trainer_count=unique_trainer_count, total_trainer_count=total_trainer_count,
                            unique_energy_count=unique_energy_count, total_energy_count=total_energy_count)
