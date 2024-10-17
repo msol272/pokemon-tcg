@@ -16,7 +16,6 @@
             align-items: center;
         }
 
-        /* Wrapper that contains side panels and gameboard */
         .gameboard-wrapper {
             display: flex;
             width: 100%;
@@ -36,6 +35,89 @@
             padding: 10px;
         }
 
+        .status-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .status-your-turn {
+            color: red;
+        }
+
+        .history-box {
+            width: 100%; /* Keep width at 100% */
+            max-width: 100%; /* Prevents the box from growing beyond its container */
+            height: 60%;
+            background-color: #404040;
+            border: 1px solid #cccccc;
+            color: #ffffff;
+            overflow-y: auto;
+            overflow-x: auto; /* Horizontal scrolling */
+            white-space: nowrap; /* Prevent text wrapping */
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Button styles */
+        .action-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            font-size: 16px;
+
+        }
+
+        .disabled-action-button {
+            cursor: not-allowed;
+            background-color: #555555;
+            color: #cccccc;
+        }
+
+        .enabled-action-button {
+            cursor: pointer;
+            background-color: #00bfff;
+            color: white;
+        }
+
+        .coin-flip-base {
+            cursor: pointer;
+            background-color: #808080;
+            color: white;
+        }
+
+        .coin-flip-result {
+            cursor: pointer;
+            background-color: #00bfff;
+            color: white;
+        }
+
+        .new-game-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            font-size: 16px;
+
+        }
+
+        .disabled-new-game-button {
+            cursor: not-allowed;
+            background-color: #555555;
+            color: #cccccc;
+        }
+
+        .enabled-new-game-button {
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+        }
+
+        /* Right panel styles */
         .right-panel {
             width: 200px;
             background-color: #2e2e2e;
@@ -60,8 +142,8 @@
         /* Gameboard styling with constant size */
         .gameboard {
             position: relative;
-            width: 1200px; /* Constant width */
-            height: 700px; /* Constant height */
+            width: 1800px; /* Constant width */
+            height: 800px; /* Constant height */
             display: flex;
             flex-direction: column;
             justify-content: space-between; /* Space out sections evenly */
@@ -76,34 +158,62 @@
             width: 90%;
         }
 
+        .seat2-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin: 5px 0;
+            order: 1;
+        }
+
         .seat2-bench-area {
             height: calc(25% - 5px);
-            order: 1;
+            order: 2;
+            margin: 5px 0;
         }
 
         .seat2-active-area {
             height: calc(25% - 5px);
-            order: 2;
-        }
-
-        .seat1-active-area {
-            height: calc(25% - 5px);
-            order: 4;
-        }
-
-        .seat1-bench-area {
-            height: calc(25% - 5px);
-            order: 5;
+            order: 3;
+            margin: 5px 0;
         }
 
         .middle-line {
             width: 100%;
             border-top: 2px solid #cccccc;
-            margin: 20px 0; /* Adds vertical space around the middle line */
-            order: 3;
+            margin: 5px 0; /* Adds vertical space around the middle line */
+            order: 4;
         }
 
-        .grid-cell {
+        .seat1-active-area {
+            height: calc(25% - 5px);
+            order: 5;
+            margin: 5px 0;
+        }
+
+        .seat1-bench-area {
+            height: calc(25% - 5px);
+            order: 6;
+            margin: 5px 0;
+        }
+
+        .seat1-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin: 5px 0;
+            order: 7;
+        }
+
+        .background-cell {
+            background-color: transparent;
+            width: 104px; /* Constant width */
+            height: 174px; /* Constant height */
+        }
+
+        .empty-cell {
             background-color: #303030;
             border: 2px solid #cccccc;
             display: flex;
@@ -112,13 +222,79 @@
             color: white;
             cursor: pointer;
             width: 100px; /* Constant width */
-            height: 150px; /* Constant height */
+            height: 170px; /* Constant height */
         }
 
-        .empty-cell {
-            background-color: transparent;
-            width: 104px; /* Constant width */
-            height: 154px; /* Constant height */
+        .active-card-cell {
+            background-color: #303030;
+            border: 2px solid #cccccc;
+            color: white;
+            width: 100px;
+            height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100px;
+            height: 140px;
+        }
+
+        .grid-image {
+            width: 100px;
+            height: 140px;
+            object-fit: cover; /* Ensures the image maintains its aspect ratio */
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: white;
+            color: black;
+            padding: 2px 5px;
+            font-size: 18px;
+            border-radius: 3px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 1px;
+        }
+
+        .state-button {
+            width: 12px;
+            height: 15px;
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 2px;
+        }
+
+        .damage-button {
+            width: 12px;
+            height: 15px;
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 2px;
+        }
+
+        .number-input {
+            width: 20px;
+            text-align: center;
+            font-size: 11px;
         }
 
         .selected-red {
@@ -130,94 +306,30 @@
         }
 
         /* CSS for flipping the gameboard based on the seat */
-        .flip-layout .seat1-bench-area {
+        .flip-layout .seat1-label {
             order: 1;
         }
 
-        .flip-layout .seat1-active-area {
+        .flip-layout .seat1-bench-area {
             order: 2;
         }
 
+        .flip-layout .seat1-active-area {
+            order: 3;
+        }
+
         .flip-layout .seat2-active-area {
-            order: 4;
+            order: 5;
         }
 
         .flip-layout .seat2-bench-area {
-            order: 5; 
+            order: 6; 
         }
 
-        /* Reverse rows within each area when seat=2 */
-        .reverse-rows .area {
-            display: flex;
-            flex-direction: column-reverse;
+        .flip-layout .seat2-label {
+            order: 7;
         }
 
-        /* Text status styles */
-        .status-text {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .status-your-turn {
-            color: red;
-        }
-
-        .status-opponent-turn,
-        .status-setup {
-            color: white;
-        }
-
-        /* Button styles */
-        .game-button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .end-turn {
-            background-color: #ff4c4c;
-            color: white;
-        }
-
-        .ready-button {
-            background-color: #00bfff;
-            color: white;
-        }
-
-        .disabled-button {
-            background-color: #555555;
-            color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        /* History box styles */
-        .history-box {
-            width: 100%;
-            height: 60%;
-            background-color: #404040;
-            border: 1px solid #cccccc;
-            color: #ffffff;
-            overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        /* New Game button */
-        .new-game-button {
-            background-color: #4caf50;
-            color: white;
-            padding: 10px;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
         .deck-image {
             width: 100%;
             height: 100%;
@@ -238,76 +350,86 @@
     <!-- Left panel with elements -->
     <div class="left-panel">
         <!-- Status text -->
-        <div class="status-text status-setup" id="statusText">Setup</div>
+        <div class="status-text status-setup" id="statusText">Wait for Opponent</div>
 
         <!-- Dynamic button -->
-        <button class="game-button disabled-button" id="actionButton" disabled>Ready</button>
+        <button class="action-button disabled-action-button" id="actionButton" disabled>-</button>
+
+        <button class="action-button coin-flip-base" id="coinButton">Flip a Coin</button>
 
         <!-- Scrollable history box -->
         <div class="history-box" id="historyBox">
-            Game log will appear here...
         </div>
 
         <!-- New Game button -->
-        <button class="new-game-button" id="newGameButton">New Game</button>
+        <button class="new-game-button disabled-new-game-button" id="newGameButton" disabled>New Game</button>
     </div>
 
     <!-- Gameboard container (scrollable) -->
     <div class="gameboard-container">
         <div class="gameboard" id="gameboard">
+            <div class="seat1-label" id="seat1-label">Seat 1: (empty)</div>
             <div class="area seat2-bench-area">
-                <div class="grid-cell" id="seat2-hand">Hand</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-b1">Bench</div>
-                <div class="grid-cell" id="seat2-b2">Bench</div>
-                <div class="grid-cell" id="seat2-b3">Bench</div>
-                <div class="grid-cell" id="seat2-b4">Bench</div>
-                <div class="grid-cell" id="seat2-b5">Bench</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-discard">Discard</div>
+                <div class="empty-cell" id="seat2-hand">Hand</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat2-b1">Bench</div>
+                <div class="empty-cell" id="seat2-b2">Bench</div>
+                <div class="empty-cell" id="seat2-b3">Bench</div>
+                <div class="empty-cell" id="seat2-b4">Bench</div>
+                <div class="empty-cell" id="seat2-b5">Bench</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat2-discard">Discard</div>
             </div>
 
             <div class="area seat2-active-area">
-                <div class="grid-cell" id="seat2-prizes">Prizes</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-spare1">Spare</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-active">Active</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-spare2">Spare</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat2-deck">
-                    <img src="/static/images/back.jpg" alt="Deck" id="seat2-deck-img" class="deck-image">
-                </div>
+                <div class="empty-cell" id="seat2-prizes">Prizes</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat2-spare1">Spare</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat2-active">Active</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat2-spare2">Spare</div>
+                <div class="background-cell"></div>
+                <div class="active-card-cell" id="seat2-deck">
+                    <div class="image-container">
+                        <img src="/static/images/back.jpg" alt="Card Image" class="grid-image">
+                        <div class="overlay">5</div>
+                    </div>
+                    <div class="controls-row">
+                        <button class="damage-button">-</button>
+                        <input type="text" value="1" class="number-input">
+                        <button class="damage-button">+</button>
+                        <button class="state-button">NML</button>
+                    </div>
+                </div>            
             </div>
 
             <div class="middle-line"></div>
 
             <div class="area seat1-active-area">
-                <div class="grid-cell" id="seat1-prizes">Prizes</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-spare1">Spare</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-active">Active</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-spare2">Spare</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-deck">
-                    <img src="/static/images/back.jpg" alt="Deck" id="seat1-deck-img" class="deck-image">
-                </div>
+                <div class="empty-cell" id="seat1-prizes">Prizes</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-spare1">Spare</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-active">Active</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-spare2">Spare</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-deck">Deck</div>
             </div>
 
             <div class="area seat1-bench-area">
-                <div class="grid-cell" id="seat1-hand">Hand</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-b1">Bench</div>
-                <div class="grid-cell" id="seat1-b2">Bench</div>
-                <div class="grid-cell" id="seat1-b3">Bench</div>
-                <div class="grid-cell" id="seat1-b4">Bench</div>
-                <div class="grid-cell" id="seat1-b5">Bench</div>
-                <div class="empty-cell"></div>
-                <div class="grid-cell" id="seat1-discard">Discard</div>
+                <div class="empty-cell" id="seat1-hand">Hand</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-b1">Bench</div>
+                <div class="empty-cell" id="seat1-b2">Bench</div>
+                <div class="empty-cell" id="seat1-b3">Bench</div>
+                <div class="empty-cell" id="seat1-b4">Bench</div>
+                <div class="empty-cell" id="seat1-b5">Bench</div>
+                <div class="background-cell"></div>
+                <div class="empty-cell" id="seat1-discard">Discard</div>
             </div>
+            <div class="seat2-label" id="seat2-label">Seat 2: (empty)</div>
         </div>
     </div>
 
@@ -325,18 +447,19 @@
     let gameboard = document.getElementById('gameboard');
     let currentSelectedCell1 = null;
     let currentSelectedCell2 = null;
+    let currentState = "waiting"
 
     // If seat is 2, flip the layout so seat2 is on the bottom
-    if ({{seat}} === '2') {
+    if ({{seat}} === 2) {
         gameboard.classList.add('flip-layout');
     }
 
     // Card selection and movement logic
-    document.querySelectorAll('.grid-cell').forEach(cell => {
+    document.querySelectorAll('.empty-cell').forEach(cell => {
         cell.addEventListener('click', function() {
-            if (!this.classList.contains('empty-cell')) {
+            if (!this.classList.contains('background-cell')) {
                 // Clear previous selection
-                if ({{seat}} === '1') {
+                if ({{seat}} === 1) {
                     if (currentSelectedCell1) {
                         currentSelectedCell1.classList.remove('selected-red');
                     }
@@ -391,38 +514,68 @@
 
     let statusText = document.getElementById("statusText");
     let actionButton = document.getElementById("actionButton");
+    let coinButton = document.getElementById("coinButton");
     let historyBox = document.getElementById("historyBox");
+    let newGameButton = document.getElementById("newGameButton");
 
-    // Example of dynamically changing status and button states
     function updateGameState(state) {
-        if (state === 'your_turn') {
-            statusText.textContent = "Your Turn";
-            statusText.classList.add('status-your-turn');
-            statusText.classList.remove('status-opponent-turn', 'status-setup');
-            actionButton.textContent = "End Turn";
-            actionButton.classList.remove('disabled-button');
-            actionButton.classList.add('end-turn');
-            actionButton.disabled = false;
-        } else if (state === 'opponents_turn') {
-            statusText.textContent = "Opponents Turn";
-            statusText.classList.add('status-opponent-turn');
-            statusText.classList.remove('status-your-turn', 'status-setup');
-            actionButton.textContent = "End Turn";
-            actionButton.classList.add('disabled-button');
-            actionButton.classList.remove('end-turn');
+        if (state === 'waiting') {
+            statusText.textContent = "Waiting For Opponent";
+            statusText.classList.remove('status-your-turn');
+            actionButton.textContent = "-";
+            actionButton.classList.remove('enabled-action-button');
+            actionButton.classList.add('disabled-action-button');
             actionButton.disabled = true;
+            newGameButton.classList.remove('enabled-new-game-button');
+            newGameButton.classList.add('disabled-new-game-button');
+            newGameButton.disabled = true;
+        } else if (state === 'ready') {
+            statusText.textContent = "Start a Game!";
+            statusText.classList.remove('status-your-turn');
+            actionButton.textContent = "-";
+            actionButton.classList.remove('enabled-action-button');
+            actionButton.classList.add('disabled-action-button');
+            actionButton.disabled = true;
+            newGameButton.classList.remove('disabled-new-game-button');
+            newGameButton.classList.add('enabled-new-game-button');
+            newGameButton.disabled = false;
         } else if (state === 'setup') {
             statusText.textContent = "Setup";
-            statusText.classList.add('status-setup');
-            statusText.classList.remove('status-your-turn', 'status-opponent-turn');
+            statusText.classList.remove('status-your-turn');
             actionButton.textContent = "Ready";
-            actionButton.classList.remove('disabled-button');
-            actionButton.classList.add('ready-button');
+            actionButton.classList.remove('disabled-action-button');
+            actionButton.classList.add('enabled-action-button');
             actionButton.disabled = false;
+            newGameButton.classList.remove('disabled-new-game-button');
+            newGameButton.classList.add('enabled-new-game-button');
+            newGameButton.disabled = false;
+            addHistoryMessage('---New Game---')
+        } else if ((state === 'p1-turn' && {{seat}} === 1) || 
+                   (state === 'p2-turn' && {{seat}} === 2)) {
+            statusText.textContent = "Your Turn";
+            statusText.classList.add('status-your-turn');
+            actionButton.textContent = "End Turn";
+            actionButton.classList.remove('disabled-action-button');
+            actionButton.classList.add('enabled-action-button');
+            actionButton.disabled = false;
+            newGameButton.classList.remove('disabled-new-game-button');
+            newGameButton.classList.add('enabled-new-game-button');
+            newGameButton.disabled = false;
+        } else if ((state === 'p1-turn' && {{seat}} === 2) || 
+                   (state === 'p2-turn' && {{seat}} === 1)) {
+            statusText.textContent = "Opp Turn";
+            statusText.classList.remove('status-your-turn');
+            actionButton.textContent = "-";
+            actionButton.classList.remove('enabled-action-button');
+            actionButton.classList.add('disabled-action-button');
+            actionButton.disabled = true;
+            newGameButton.classList.remove('disabled-new-game-button');
+            newGameButton.classList.add('enabled-new-game-button');
+            newGameButton.disabled = false;
         }
+        currentState = state
     }
 
-    // Add history log
     function addHistoryMessage(message) {
         const log = document.createElement('div');
         log.textContent = message;
@@ -432,38 +585,47 @@
 
     // Button events
     actionButton.addEventListener('click', function() {
-        if (actionButton.textContent === "Ready") {
-            socket.emit('ready');
-        } else if (actionButton.textContent === "End Turn") {
-            socket.emit('end_turn');
+        actionButton.classList.remove('enabled-action-button');
+        actionButton.classList.add('disabled-action-button');
+        actionButton.disabled = true;
+        socket.emit('action_button', {'action': actionButton.textContent, 'seat': {{seat}}});
+
+    });
+
+    coinButton.addEventListener('click', function() {
+        const username = "{{ request.args.get('username') }}";  // Extract username from URL
+        if (coinButton.textContent === "Flip a Coin") {
+            socket.emit('coin_button', username);
+        } else {
+            coinButton.textContent = "Flip a Coin";
+            coinButton.classList.remove('coin-flip-result');
+            coinButton.classList.add('coin-flip-base');
         }
     });
 
-    document.getElementById("newGameButton").addEventListener('click', function() {
-        socket.emit('new_game');
+    newGameButton.addEventListener('click', function() {
+        let response = confirm("Are you sure?")
+        if (response) {
+            socket.emit('new_game');
+        }
     });
 
     // Example socket event listeners
-    socket.on('game_state_change', function(state) {
-        updateGameState(state);
-    });
 
-    socket.on('action_log', function(message) {
-        addHistoryMessage(message);
-    });
+
 
     // Reference to right panel where cards will be displayed
     let rightPanel = document.querySelector('.right-panel');
-    let allCards =  {{ all_cards | tojson }};
+    let allCards =  {};
 
     // Handle deck click to display card images
-    document.getElementById('seat1-deck-img').addEventListener('click', function() {
-        socket.emit('deck_selected', { seat: 1, all_cards: allCards });
-    });
+    // document.getElementById('seat1-deck-img').addEventListener('click', function() {
+    //     socket.emit('deck_selected', { seat: 1, all_cards: allCards });
+    // });
 
-    document.getElementById('seat2-deck-img').addEventListener('click', function() {
-        socket.emit('deck_selected', { seat: 2, all_cards: allCards });
-    });
+    // document.getElementById('seat2-deck-img').addEventListener('click', function() {
+    //     socket.emit('deck_selected', { seat: 2, all_cards: allCards });
+    // });
 
     // Listen for card deck images update from the server
     socket.on('display_deck_cards', function(data) {
@@ -478,6 +640,50 @@
             rightPanel.appendChild(cardImg);
         });
     });
+
+    let seat1Label = document.getElementById('seat1-label');
+    let seat2Label = document.getElementById('seat2-label');
+
+    // Websocket events
+
+    // Player joined or left
+    socket.on('player_update', function(data) {
+        seat1Label.textContent = data.user1 ? `Seat 1: ${data.user1} - ${data.deck1}` : 'Seat 1: (empty)';
+        seat2Label.textContent = data.user2 ? `Seat 2: ${data.user2} - ${data.deck2}` : 'Seat 2: (empty)';
+   });
+
+    // Error popup
+    socket.on('error', function(data) {
+        alert(data.message)
+   });
+
+    // Add message to history box
+    socket.on('action_log', function(message) {
+        addHistoryMessage(message);
+    });
+
+    // Change game state text and button
+    socket.on('game_state_change', function(state) {
+        updateGameState(state);
+    });
+
+    socket.on('coin_flip_result', function(data) {
+        addHistoryMessage(`${data.user} coin: ${data.result}`);
+        coinButton.textContent = data.result;
+        coinButton.classList.remove('coin-flip-base');
+        coinButton.classList.add('coin-flip-result');
+    });
+
+    // When the document is fully loaded, emit the join_game event
+    document.addEventListener('DOMContentLoaded', function() {
+        const username = "{{ request.args.get('username') }}";  // Extract username from URL
+        const deckname = "{{ request.args.get('deck') }}";      // Extract deckname from URL
+        const seat = "{{ request.args.get('seat') }}";          // Extract seat from URL
+
+        // Emit 'join_game' event to the server with the user data
+        socket.emit('join_game', { username: username, deckname: deckname, seat: seat });
+    });
+    
 </script>
 
 </body>

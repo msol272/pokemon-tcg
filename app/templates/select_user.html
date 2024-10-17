@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select User - Join Seat 1</title>
+    <title>Select User - Join Seat {{seat}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,12 +32,12 @@
     </style>
 </head>
 <body>
-    <h1>Select a User to Join Seat 1</h1>
+    <h1>Select a User to Join Seat {{seat}}</h1>
 
     <div class="container">
         <div class="user-list">
             {% for user in users %}
-                <a href="{{ url_for('home.select_deck', username=user, seat=1) }}">
+                <a href="{{ url_for('home.select_deck', username=user, seat=seat) }}">
                     <button>{{ user }}</button>
                 </a>
             {% endfor %}
