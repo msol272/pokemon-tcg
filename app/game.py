@@ -10,10 +10,37 @@ players = {
     1: {'username': '', 'deckname': '', 'sid': -1},
     2: {'username': '', 'deckname': '', 'sid': -1},
 }
-game_state = "waiting"
+board = {
+    "seat1-deck"    : [],
+    "seat1-discard" : [],
+    "seat1-prizes"  : [],
+    "seat1-hand"    : [],
+    "seat1-spare1"  : [],
+    "seat1-spare2"  : [],
+    "seat1-b1"      : [],
+    "seat1-b2"      : [],
+    "seat1-b3"      : [],
+    "seat1-b4"      : [],
+    "seat1-b5"      : [],
+    "seat1-active"  : [],
+    
+    "seat2-deck"    : [],
+    "seat2-discard" : [],
+    "seat2-prizes"  : [],
+    "seat2-hand"    : [],
+    "seat2-spare1"  : [],
+    "seat2-spare2"  : [],
+    "seat2-b1"      : [],
+    "seat2-b2"      : [],
+    "seat2-b3"      : [],
+    "seat2-b4"      : [],
+    "seat2-b5"      : [],
+    "seat2-active"  : [],
+}
+game_state = "ready"
 
 @game_bp.route('/gameboard')
-def board():
+def gameboard():
     # Retrieve query parameters from the URL
     seat = int(request.args.get('seat'))
     return render_template('gameboard.html', seat=seat)
@@ -33,7 +60,12 @@ def load_card_list(username, deckname):
         deck = json.load(file)
 
     # Filter the cards that are in the deck
-    user_cards = [card for card in all_cards if card['id'] in deck and deck[card['id']] > 0]
+    user_cards = []
+    for card in all_cards:
+        if card['id'] in deck:
+            count = deck[card['id']]
+            for i in range(0, count):
+                user_cards.append(card)
     return user_cards
 
 def set_game_state(state):
@@ -41,22 +73,23 @@ def set_game_state(state):
     game_state = state
     emit('game_state_change', state, broadcast=True)    
 
+def set_card_stack(spot, cards):
+    global board
+    board[spot] = cards
+    emit('set_card_stack', {'spot': spot, 'cards': cards}, broadcast=True)
+
+def reset_board():
+    global board
+    for key in board:
+        board[key] = []
+    emit('sync_board', board, broadcast=True)
+
 # SocketIO event for handling real-time updates
 def register_socketio_events(socketio):
-    # @socketio.on('card_selected')
-    # def handle_card_selected(data):
-    #     # Broadcast the card selection to all clients except the sender
-    #     emit('update_card_selection', data, broadcast=True)
+    @socketio.on('cell_selected')
+    def handle_cell_selected(data):
+        emit('set_right_panel', board[data['spot']])
     
-    # @socketio.on('deck_selected')
-    # def handle_deck_selected(data):
-    #     # Mock card image paths (or use the actual ones you loaded earlier)
-    #     card_images = [{'id': card["id"]} for card in data["all_cards"]]
-
-    #     # Send the card images back to the client
-    #     emit('display_deck_cards', {'cards': card_images}, broadcast=False)
-
-
     @socketio.on('join_game')
     def handle_player_join(data):
         username = data['username']
@@ -67,13 +100,7 @@ def register_socketio_events(socketio):
             players[seat] = {'username': username, 'deckname': deckname, 'sid': request.sid, 'cards': cards}
             emit('action_log', '{} joined in seat {}'.format(username, seat), broadcast=True)
             if players[1]['username'] != '' and players[2]['username'] != '':
-                if game_state == "waiting":
-                    set_game_state("ready")
-                else:
-                    set_game_state(game_state)
-            elif game_state == "waiting":
-                set_game_state("waiting")
-
+                emit('set_new_game_enable', True, broadcast=True)
         else:
             emit('error', {'message': 'Seat {} already taken by user {}'.format(seat, players[seat]["username"])})
         emit('player_update', {
@@ -82,6 +109,8 @@ def register_socketio_events(socketio):
             'user2': players[2]['username'],
             'deck2': players[2]['deckname'],
         }, broadcast=True)
+        emit('sync_board', board, broadcast=True)
+        emit('game_state_change', game_state, broadcast=True)    
 
     @socketio.on('disconnect')
     def handle_disconnect():
@@ -98,8 +127,7 @@ def register_socketio_events(socketio):
                     'user2': players[2]['username'],
                     'deck2': players[2]['deckname'],
                 }, broadcast=True)
-                if game_state == "ready":
-                    set_game_state("waiting")
+                emit('set_new_game_enable', False, broadcast=True)
                 break
     
     @socketio.on('new_game')
@@ -108,18 +136,19 @@ def register_socketio_events(socketio):
         random.shuffle(players[1]['cards'])
         random.shuffle(players[2]['cards'])
 
-        # Deal cards
-        emit('add_cards', {'spot': 'seat1-prizes', 'cards': players[1]['cards'][0:6]}, broadcast=True)
-        emit('add_cards', {'spot': 'seat1-hand', 'cards': players[1]['cards'][6:13]}, broadcast=True)
-        emit('add_cards', {'spot': 'seat1-deck', 'cards': players[1]['cards'][13:]}, broadcast=True)
+        reset_board()
 
-        emit('add_cards', {'spot': 'seat2-prizes', 'cards': players[2]['cards'][0:6]}, broadcast=True)
-        emit('add_cards', {'spot': 'seat2-hand', 'cards': players[2]['cards'][6:13]}, broadcast=True)
-        emit('add_cards', {'spot': 'seat2-deck', 'cards': players[2]['cards'][13:]}, broadcast=True)
+        # Deal cards
+        set_card_stack('seat1-prizes', players[1]['cards'][0:6])
+        set_card_stack('seat1-hand', players[1]['cards'][6:13])
+        set_card_stack('seat1-deck', players[1]['cards'][13:])
+
+        set_card_stack('seat2-prizes', players[2]['cards'][0:6])
+        set_card_stack('seat2-hand', players[2]['cards'][6:13])
+        set_card_stack('seat2-deck', players[2]['cards'][13:])
 
         players[1]['ready'] = False
         players[2]['ready'] = False
-
 
         set_game_state('setup')
 

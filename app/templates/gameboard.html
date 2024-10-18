@@ -131,6 +131,42 @@
             overflow-y: auto; /* Enable scrolling */
         }
 
+        /* Basic styling for the panel */
+        #card-panel {
+          width: 300px;
+          height: 500px;
+          border: 1px solid #000;
+          overflow-y: scroll;
+          padding: 10px;
+        }
+
+        .card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .card img {
+          width: 100px;
+          height: 150px;
+        }
+
+        .card-buttons {
+          display: flex;
+          justify-content: space-between;
+          width: 100px;
+          margin-top: 10px;
+        }
+
+        button {
+          padding: 5px;
+        }
+
+        #move-all-btn {
+          margin-bottom: 10px;
+        }
+
         /* Scrollable gameboard container */
         .gameboard-container {
             flex-grow: 0;
@@ -207,10 +243,25 @@
             order: 7;
         }
 
+        .cell-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 104px; /* Constant width */
+            height: 194px; /* Constant height */
+        }
+
+        .cell-label {
+            font-size: 14px;
+            color: white;
+            margin-bottom: 5px; /* Space between label and cell */
+        }
+
+
         .background-cell {
             background-color: transparent;
             width: 104px; /* Constant width */
-            height: 174px; /* Constant height */
+            height: 164px; /* Constant height */
         }
 
         .empty-cell {
@@ -222,15 +273,15 @@
             color: white;
             cursor: pointer;
             width: 100px; /* Constant width */
-            height: 170px; /* Constant height */
+            height: 160px; /* Constant height */
         }
 
-        .active-card-cell {
+        .card-cell {
             background-color: #303030;
             border: 2px solid #cccccc;
             color: white;
             width: 100px;
-            height: 170px;
+            height: 160px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -257,27 +308,29 @@
             background-color: white;
             color: black;
             padding: 2px 5px;
-            font-size: 18px;
+            font-size: 12px;
             border-radius: 3px;
         }
 
         .controls-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             width: 100%;
-            padding: 1px;
+            padding: 0px;
+            gap: 2px;
         }
 
-        .state-button {
-            width: 12px;
+        .control-button {
+            width: 50px;
             height: 15px;
             background-color: #4caf50;
             border: none;
             color: white;
             cursor: pointer;
             font-size: 11px;
-            padding: 2px 2px;
+            margin: 0;
+            padding: 0;
         }
 
         .damage-button {
@@ -288,13 +341,16 @@
             color: white;
             cursor: pointer;
             font-size: 11px;
-            padding: 2px 2px;
+            margin: 0;
+            padding: 0;
         }
 
         .number-input {
             width: 20px;
             text-align: center;
             font-size: 11px;
+            margin: 0;
+            padding: 0;
         }
 
         .selected-red {
@@ -370,72 +426,134 @@
         <div class="gameboard" id="gameboard">
             <div class="seat1-label" id="seat1-label">Seat 1: (empty)</div>
             <div class="area seat2-bench-area">
-                <div class="empty-cell" id="seat2-hand">Hand</div>
+                <div class="cell-container" for="seat2-hand">
+                    <label class="cell-label" for="seat2-hand">Hand</label>
+                    <div class="empty-cell" id="seat2-hand" stack-type="default"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat2-b1">Bench</div>
-                <div class="empty-cell" id="seat2-b2">Bench</div>
-                <div class="empty-cell" id="seat2-b3">Bench</div>
-                <div class="empty-cell" id="seat2-b4">Bench</div>
-                <div class="empty-cell" id="seat2-b5">Bench</div>
+                <div class="cell-container" for="seat2-b1">
+                    <label class="cell-label" for="seat2-b1">Bench 1</label>
+                    <div class="empty-cell" id="seat2-b1" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat2-b2">
+                    <label class="cell-label" for="seat2-b2">Bench 2</label>
+                    <div class="empty-cell" id="seat2-b2" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat2-b3">
+                    <label class="cell-label" for="seat2-b3">Bench 3</label>
+                    <div class="empty-cell" id="seat2-b3" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat2-b4">
+                    <label class="cell-label" for="seat2-b4">Bench 4</label>
+                    <div class="empty-cell" id="seat2-b4" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat2-b5">
+                    <label class="cell-label" for="seat2-b5">Bench 5</label>
+                    <div class="empty-cell" id="seat2-b5" stack-type="in-play"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat2-discard">Discard</div>
+                <div class="cell-container" for="seat2-discard">
+                    <label class="cell-label" for="seat2-discard">Discard</label>
+                    <div class="empty-cell" id="seat2-discard" stack-type="default" face-up></div>
+                </div>
             </div>
 
             <div class="area seat2-active-area">
-                <div class="empty-cell" id="seat2-prizes">Prizes</div>
+                <div class="cell-container" for="seat2-prizes">
+                    <label class="cell-label" for="seat2-prizes">Prizes</label>
+                    <div class="empty-cell" id="seat2-prizes" stack-type="drawable"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat2-spare1">Spare</div>
+                <div class="cell-container" for="seat2-spare1">
+                    <label class="cell-label" for="seat2-spare1">Table</label>
+                    <div class="empty-cell" id="seat2-spare1" stack-type="in-play" face-up></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat2-active">Active</div>
+                <div class="cell-container" for="seat2-active">
+                    <label class="cell-label" for="seat2-active">Active</label>
+                    <div class="empty-cell" id="seat2-active" stack-type="in-play"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat2-spare2">Spare</div>
+                <div class="cell-container" for="seat2-spare2">
+                    <label class="cell-label" for="seat2-spare2">Table</label>
+                    <div class="empty-cell" id="seat2-spare2" stack-type="in-play" face-up></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="active-card-cell" id="seat2-deck">
-                    <div class="image-container">
-                        <img src="/static/images/back.jpg" alt="Card Image" class="grid-image">
-                        <div class="overlay">5</div>
-                    </div>
-                    <div class="controls-row">
-                        <button class="damage-button">-</button>
-                        <input type="text" value="1" class="number-input">
-                        <button class="damage-button">+</button>
-                        <button class="state-button">NML</button>
-                    </div>
-                </div>            
+                <div class="cell-container" for="seat2-deck">
+                    <label class="cell-label" for="seat2-deck">Deck</label>
+                    <div class="empty-cell" id="seat2-deck" stack-type="drawable"></div>
+                </div>
             </div>
 
             <div class="middle-line"></div>
 
             <div class="area seat1-active-area">
-                <div class="empty-cell" id="seat1-prizes">Prizes</div>
+                <div class="cell-container" for="seat1-prizes">
+                    <label class="cell-label" for="seat1-prizes">Prizes</label>
+                    <div class="empty-cell" id="seat1-prizes" stack-type="drawable"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-spare1">Spare</div>
+                <div class="cell-container" for="seat1-spare1">
+                    <label class="cell-label" for="seat1-spare1">Table</label>
+                    <div class="empty-cell" id="seat1-spare1" stack-type="in-play" face-up></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-active">Active</div>
+                <div class="cell-container" for="seat1-active">
+                    <label class="cell-label" for="seat1-active">Active</label>
+                    <div class="empty-cell" id="seat1-active" stack-type="in-play"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-spare2">Spare</div>
+                <div class="cell-container" for="seat1-spare2">
+                    <label class="cell-label" for="seat1-spare2">Table</label>
+                    <div class="empty-cell" id="seat1-spare2" stack-type="in-play" face-up></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-deck">Deck</div>
+                <div class="cell-container" for="seat1-deck">
+                    <label class="cell-label" for="seat1-deck">Deck</label>
+                    <div class="empty-cell" id="seat1-deck" stack-type="drawable" face-up></div>
+                </div>
             </div>
 
             <div class="area seat1-bench-area">
-                <div class="empty-cell" id="seat1-hand">Hand</div>
+                <div class="cell-container" for="seat1-hand">
+                    <label class="cell-label" for="seat1-hand">Hand</label>
+                    <div class="empty-cell" id="seat1-hand" stack-type="default"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-b1">Bench</div>
-                <div class="empty-cell" id="seat1-b2">Bench</div>
-                <div class="empty-cell" id="seat1-b3">Bench</div>
-                <div class="empty-cell" id="seat1-b4">Bench</div>
-                <div class="empty-cell" id="seat1-b5">Bench</div>
+                <div class="cell-container" for="seat1-b1">
+                    <label class="cell-label" for="seat1-b1">Bench 1</label>
+                    <div class="empty-cell" id="seat1-b1" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat1-b2">
+                    <label class="cell-label" for="seat1-b2">Bench 2</label>
+                    <div class="empty-cell" id="seat1-b2" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat1-b3">
+                    <label class="cell-label" for="seat1-b3">Bench 3</label>
+                    <div class="empty-cell" id="seat1-b3" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat1-b4">
+                    <label class="cell-label" for="seat1-b4">Bench 4</label>
+                    <div class="empty-cell" id="seat1-b4" stack-type="in-play"></div>
+                </div>
+                <div class="cell-container" for="seat1-b5">
+                    <label class="cell-label" for="seat1-b5">Bench 5</label>
+                    <div class="empty-cell" id="seat1-b5" stack-type="in-play"></div>
+                </div>
                 <div class="background-cell"></div>
-                <div class="empty-cell" id="seat1-discard">Discard</div>
+                <div class="cell-container" for="seat1-discard">
+                    <label class="cell-label" for="seat1-discard">Discard</label>
+                    <div class="empty-cell" id="seat1-discard" stack-type="default" face-up></div>
+                </div>
             </div>
             <div class="seat2-label" id="seat2-label">Seat 2: (empty)</div>
         </div>
     </div>
 
     <!-- Right panel -->
-    <div class="right-panel">
-        Right Panel
+    <div class="right-panel" id="right-panel">
+        <button id="move-all-btn">Move All</button>
+        <div id="card-panel"></div>
     </div>
 
 </div>
@@ -447,7 +565,7 @@
     let gameboard = document.getElementById('gameboard');
     let currentSelectedCell1 = null;
     let currentSelectedCell2 = null;
-    let currentState = "waiting"
+    let currentState = "ready"
 
     // If seat is 2, flip the layout so seat2 is on the bottom
     if ({{seat}} === 2) {
@@ -455,61 +573,41 @@
     }
 
     // Card selection and movement logic
-    document.querySelectorAll('.empty-cell').forEach(cell => {
+    document.querySelectorAll('.cell-container').forEach(cell => {
         cell.addEventListener('click', function() {
-            if (!this.classList.contains('background-cell')) {
-                // Clear previous selection
-                if ({{seat}} === 1) {
-                    if (currentSelectedCell1) {
-                        currentSelectedCell1.classList.remove('selected-red');
-                    }
-
-                    // Add selected border based on seat
-                    this.classList.add('selected-red');
-    
-                    // Store the selected cell
-                    currentSelectedCell1 = this;
-                } else {
-                    if (currentSelectedCell2) {
-                        currentSelectedCell2.classList.remove('selected-blue');
-                    }
-
-                    // Add selected border based on seat
-                    this.classList.add('selected-blue');
-    
-                    // Store the selected cell
-                    currentSelectedCell2 = this;
+            // Clear previous selection
+            if ({{seat}} === 1) {
+                if (currentSelectedCell1) {
+                    currentSelectedCell1.classList.remove('selected-red');
                 }
 
-                // Send the selection to the server via WebSocket
-                socket.emit('card_selected', {
-                    seat: {{seat}},
-                    cardId: this.id
-                });
+                // Add selected border based on seat
+                this.classList.add('selected-red');
+
+                // Store the selected cell
+                currentSelectedCell1 = this;
+            } else {
+                if (currentSelectedCell2) {
+                    currentSelectedCell2.classList.remove('selected-blue');
+                }
+
+                // Add selected border based on seat
+                this.classList.add('selected-blue');
+
+                // Store the selected cell
+                currentSelectedCell2 = this;
             }
+
+            // Send the selection to the server via WebSocket
+            socket.emit('cell_selected', {
+                spot: this.getAttribute("for")
+            });
         });
     });
 
     // Listen for updates from the server for card selection
     socket.on('update_card_selection', function(data) {
-        // Remove the current selection highlight (if any)
-        if (data.seat === 1 && currentSelectedCell1) {
-            currentSelectedCell1.classList.remove('selected-red');
-        } else if (data.seat === 2 && currentSelectedCell2) {
-            currentSelectedCell2.classList.remove('selected-blue');
-        }
 
-        // Find the new selected cell and highlight it
-        let selectedCell = document.getElementById(data.cardId);
-        if (selectedCell) {
-            if (data.seat === 1) {
-                selectedCell.classList.add('selected-red');
-                currentSelectedCell1 = selectedCell;
-            } else {
-                selectedCell.classList.add('selected-blue');
-                currentSelectedCell2 = selectedCell;
-            }
-        }
     });
 
     let statusText = document.getElementById("statusText");
@@ -519,26 +617,13 @@
     let newGameButton = document.getElementById("newGameButton");
 
     function updateGameState(state) {
-        if (state === 'waiting') {
-            statusText.textContent = "Waiting For Opponent";
-            statusText.classList.remove('status-your-turn');
-            actionButton.textContent = "-";
-            actionButton.classList.remove('enabled-action-button');
-            actionButton.classList.add('disabled-action-button');
-            actionButton.disabled = true;
-            newGameButton.classList.remove('enabled-new-game-button');
-            newGameButton.classList.add('disabled-new-game-button');
-            newGameButton.disabled = true;
-        } else if (state === 'ready') {
+        if (state === 'ready') {
             statusText.textContent = "Start a Game!";
             statusText.classList.remove('status-your-turn');
             actionButton.textContent = "-";
             actionButton.classList.remove('enabled-action-button');
             actionButton.classList.add('disabled-action-button');
             actionButton.disabled = true;
-            newGameButton.classList.remove('disabled-new-game-button');
-            newGameButton.classList.add('enabled-new-game-button');
-            newGameButton.disabled = false;
         } else if (state === 'setup') {
             statusText.textContent = "Setup";
             statusText.classList.remove('status-your-turn');
@@ -546,34 +631,99 @@
             actionButton.classList.remove('disabled-action-button');
             actionButton.classList.add('enabled-action-button');
             actionButton.disabled = false;
-            newGameButton.classList.remove('disabled-new-game-button');
-            newGameButton.classList.add('enabled-new-game-button');
-            newGameButton.disabled = false;
+            document.getElementById('seat1-b1').removeAttribute('face-up')
+            document.getElementById('seat1-b2').removeAttribute('face-up')
+            document.getElementById('seat1-b3').removeAttribute('face-up')
+            document.getElementById('seat1-b4').removeAttribute('face-up')
+            document.getElementById('seat1-b5').removeAttribute('face-up')
+            document.getElementById('seat1-active').removeAttribute('face-up')
+            document.getElementById('seat2-b1').removeAttribute('face-up')
+            document.getElementById('seat2-b2').removeAttribute('face-up')
+            document.getElementById('seat2-b3').removeAttribute('face-up')
+            document.getElementById('seat2-b4').removeAttribute('face-up')
+            document.getElementById('seat2-b5').removeAttribute('face-up')
+            document.getElementById('seat2-active').removeAttribute('face-up')
             addHistoryMessage('---New Game---')
-        } else if ((state === 'p1-turn' && {{seat}} === 1) || 
-                   (state === 'p2-turn' && {{seat}} === 2)) {
-            statusText.textContent = "Your Turn";
-            statusText.classList.add('status-your-turn');
-            actionButton.textContent = "End Turn";
-            actionButton.classList.remove('disabled-action-button');
-            actionButton.classList.add('enabled-action-button');
-            actionButton.disabled = false;
-            newGameButton.classList.remove('disabled-new-game-button');
-            newGameButton.classList.add('enabled-new-game-button');
-            newGameButton.disabled = false;
-        } else if ((state === 'p1-turn' && {{seat}} === 2) || 
-                   (state === 'p2-turn' && {{seat}} === 1)) {
-            statusText.textContent = "Opp Turn";
-            statusText.classList.remove('status-your-turn');
-            actionButton.textContent = "-";
-            actionButton.classList.remove('enabled-action-button');
-            actionButton.classList.add('disabled-action-button');
-            actionButton.disabled = true;
-            newGameButton.classList.remove('disabled-new-game-button');
-            newGameButton.classList.add('enabled-new-game-button');
-            newGameButton.disabled = false;
+        } else {
+            document.getElementById('seat1-b1').setAttribute('face-up', '')
+            document.getElementById('seat1-b2').setAttribute('face-up', '')
+            document.getElementById('seat1-b3').setAttribute('face-up', '')
+            document.getElementById('seat1-b4').setAttribute('face-up', '')
+            document.getElementById('seat1-b5').setAttribute('face-up', '')
+            document.getElementById('seat1-active').setAttribute('face-up', '')
+            document.getElementById('seat2-b1').setAttribute('face-up', '')
+            document.getElementById('seat2-b2').setAttribute('face-up', '')
+            document.getElementById('seat2-b3').setAttribute('face-up', '')
+            document.getElementById('seat2-b4').setAttribute('face-up', '')
+            document.getElementById('seat2-b5').setAttribute('face-up', '')
+            document.getElementById('seat2-active').setAttribute('face-up', '')
+            if ((state === 'p1-turn' && {{seat}} === 1) || 
+                       (state === 'p2-turn' && {{seat}} === 2)) {
+                statusText.textContent = "Your Turn";
+                statusText.classList.add('status-your-turn');
+                actionButton.textContent = "End Turn";
+                actionButton.classList.remove('disabled-action-button');
+                actionButton.classList.add('enabled-action-button');
+                actionButton.disabled = false;
+            } else if ((state === 'p1-turn' && {{seat}} === 2) || 
+                       (state === 'p2-turn' && {{seat}} === 1)) {
+                statusText.textContent = "Opp Turn";
+                statusText.classList.remove('status-your-turn');
+                actionButton.textContent = "-";
+                actionButton.classList.remove('enabled-action-button');
+                actionButton.classList.add('disabled-action-button');
+                actionButton.disabled = true;
+            }
         }
         currentState = state
+    }
+
+    function setCardStack (element_id, cards) {
+        const element = document.getElementById(element_id);
+
+        // Preserve custom properties
+        const stackType = element.getAttribute("stack-type");
+        const faceUp = element.hasAttribute("face-up");
+
+        if (cards.length === 0) {
+            // Change to empty-cell
+            element.className = "empty-cell";
+            element.innerHTML = "";            
+        } else {
+            let cardImg = "/static/images/back.jpg"
+            if (faceUp) {
+                cardImg = `/static/images/${cards[0].id}.jpg`
+            }
+
+            let controlBar = ``
+            if (stackType === "drawable") {
+                controlBar = `<div class="controls-row">
+                    <button class="control-button">Draw</button>
+                    <button class="control-button">Shuffle</button>
+                </div>`
+            } else if (stackType === "in-play") {
+                controlBar = `<div class="controls-row">
+                    <button class="damage-button">-</button>
+                    <input type="text" value="1" class="number-input">
+                    <button class="damage-button">+</button>
+                    <button class="control-button">NML</button>
+                </div>`
+            }
+
+            element.className = "card-cell";
+            element.innerHTML = `
+                <div class="image-container">
+                    <img src=${cardImg} alt="Card Image" class="grid-image">
+                    <div class="overlay">${cards.length}</div>
+                </div>
+                ${controlBar}`;
+        }
+
+        // Restore custom properties after changing the content
+        element.setAttribute("stack-type", stackType);
+        if (faceUp) {
+            element.setAttribute("face-up", "");
+        }
     }
 
     function addHistoryMessage(message) {
@@ -581,6 +731,31 @@
         log.textContent = message;
         historyBox.appendChild(log);
         historyBox.scrollTop = historyBox.scrollHeight; // Auto-scroll to bottom
+    }
+
+    function createCard(card) {
+        const cardDiv = document.createElement('div');
+        cardDiv.classList.add('card');
+
+        const img = document.createElement('img');
+        img.src = `/static/images/${card.id}.jpg`;
+        cardDiv.appendChild(img);
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.classList.add('card-buttons');
+
+        const moveBtn = document.createElement('button');
+        moveBtn.innerText = 'Move';
+        moveBtn.addEventListener('click', () => moveCard(card.id));
+        buttonsDiv.appendChild(moveBtn);
+
+        const flipBtn = document.createElement('button');
+        flipBtn.innerText = 'Flip';
+        flipBtn.addEventListener('click', () => flipCard(card.id));
+        buttonsDiv.appendChild(flipBtn);
+
+        cardDiv.appendChild(buttonsDiv);
+        return cardDiv;
     }
 
     // Button events
@@ -611,36 +786,6 @@
     });
 
     // Example socket event listeners
-
-
-
-    // Reference to right panel where cards will be displayed
-    let rightPanel = document.querySelector('.right-panel');
-    let allCards =  {};
-
-    // Handle deck click to display card images
-    // document.getElementById('seat1-deck-img').addEventListener('click', function() {
-    //     socket.emit('deck_selected', { seat: 1, all_cards: allCards });
-    // });
-
-    // document.getElementById('seat2-deck-img').addEventListener('click', function() {
-    //     socket.emit('deck_selected', { seat: 2, all_cards: allCards });
-    // });
-
-    // Listen for card deck images update from the server
-    socket.on('display_deck_cards', function(data) {
-        // Clear the right panel first
-        rightPanel.innerHTML = '';
-
-        // Loop through the card images and add them to the right panel
-        data.cards.forEach(function(card) {
-            let cardImg = document.createElement('img');
-            cardImg.src = `/static/images/${card.id}.jpg`;
-            cardImg.classList.add('card-image');
-            rightPanel.appendChild(cardImg);
-        });
-    });
-
     let seat1Label = document.getElementById('seat1-label');
     let seat2Label = document.getElementById('seat2-label');
 
@@ -660,6 +805,38 @@
     // Add message to history box
     socket.on('action_log', function(message) {
         addHistoryMessage(message);
+    });
+
+    socket.on('sync_board', function(data) {
+        for (const key in data) {
+            setCardStack(key, data[key]);
+        }
+    });
+
+    socket.on('set_card_stack', function(data) {
+        setCardStack(data.spot, data.cards);
+    });
+
+    socket.on('set_right_panel', function(data) {
+      const cardPanel = document.getElementById('card-panel');
+      cardPanel.innerHTML = ''; // Clear existing content
+      data.forEach(card => {
+        const cardElement = createCard(card);
+        cardPanel.appendChild(cardElement);
+      });
+    });
+
+
+    socket.on('set_new_game_enable', function(enable) {
+        if (enable) {
+            newGameButton.classList.remove('disabled-new-game-button');
+            newGameButton.classList.add('enabled-new-game-button');
+            newGameButton.disabled = false;
+        } else {
+            newGameButton.classList.remove('enabled-new-game-button');
+            newGameButton.classList.add('disabled-new-game-button');
+            newGameButton.disabled = true;            
+        }
     });
 
     // Change game state text and button
