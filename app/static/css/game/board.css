@@ -1,0 +1,218 @@
+/* Scrollable gameboard container */
+.gameboard-container {
+    flex-grow: 0;
+    display: flex;
+    height: 100%;
+    overflow: auto; /* Enables scrolling */
+}
+
+/* Gameboard styling with constant size */
+.gameboard {
+    position: relative;
+    width: 1800px; /* Constant width */
+    height: 800px; /* Constant height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Space out sections evenly */
+    align-items: center;
+}
+
+.area {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(1, 1fr);
+    gap: 5px;
+    width: 90%;
+}
+
+.seat2-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin: 5px 0;
+    order: 1;
+}
+
+.seat2-bench-area {
+    height: calc(25% - 5px);
+    order: 2;
+    margin: 5px 0;
+}
+
+.seat2-active-area {
+    height: calc(25% - 5px);
+    order: 3;
+    margin: 5px 0;
+}
+
+.middle-line {
+    width: 100%;
+    border-top: 2px solid #cccccc;
+    margin: 5px 0; /* Adds vertical space around the middle line */
+    order: 4;
+}
+
+.seat1-active-area {
+    height: calc(25% - 5px);
+    order: 5;
+    margin: 5px 0;
+}
+
+.seat1-bench-area {
+    height: calc(25% - 5px);
+    order: 6;
+    margin: 5px 0;
+}
+
+.seat1-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin: 5px 0;
+    order: 7;
+}
+
+.cell-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 104px; /* Constant width */
+    height: 194px; /* Constant height */
+}
+
+.cell-label {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 5px; /* Space between label and cell */
+}
+
+
+.background-cell {
+    background-color: transparent;
+    width: 104px; /* Constant width */
+    height: 164px; /* Constant height */
+}
+
+.empty-cell {
+    background-color: #303030;
+    border: 2px solid #cccccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+    width: 100px; /* Constant width */
+    height: 160px; /* Constant height */
+}
+
+.card-cell {
+    background-color: #303030;
+    border: 2px solid #cccccc;
+    color: white;
+    width: 100px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.image-container {
+    position: relative;
+    width: 100px;
+    height: 140px;
+}
+
+.grid-image {
+    width: 100px;
+    height: 140px;
+    object-fit: cover; /* Ensures the image maintains its aspect ratio */
+}
+
+.overlay {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: white;
+    color: black;
+    padding: 2px 5px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+
+.controls-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 0px;
+    gap: 2px;
+}
+
+.control-button {
+    width: 50px;
+    height: 15px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+.damage-button {
+    width: 12px;
+    height: 15px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+.number-input {
+    width: 20px;
+    text-align: center;
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+.selected-red {
+    border: 2px solid red;
+}
+
+.selected-blue {
+    border: 2px solid blue;
+}
+
+/* CSS for flipping the gameboard based on the seat */
+.flip-layout .seat1-label {
+    order: 1;
+}
+
+.flip-layout .seat1-bench-area {
+    order: 2;
+}
+
+.flip-layout .seat1-active-area {
+    order: 3;
+}
+
+.flip-layout .seat2-active-area {
+    order: 5;
+}
+
+.flip-layout .seat2-bench-area {
+    order: 6; 
+}
+
+.flip-layout .seat2-label {
+    order: 7;
+}

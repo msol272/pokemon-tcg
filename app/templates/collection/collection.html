@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ username }}'s Collection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/collection.css') }}">
+</head>
+<body>
+
+    <h1>{{ username }}'s Card Collection</h1>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <input type="text" id="search-bar" placeholder="Search for a card..." oninput="filterCards()">
+        <select id="view-mode" onchange="filterCards()">
+            <option value="all">All Cards</option>
+            <option value="owned">Owned Cards</option>
+            <option value="unowned">Unowned Cards</option>
+        </select>
+        <select id="card-type" onchange="filterCards()">
+            <option value="All">All Types</option>
+            <option value="Grass">Grass</option>
+            <option value="Fire">Fire</option>
+            <option value="Water">Water</option>
+            <option value="Lightning">Lightning</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Psychic">Psychic</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Darkness">Darkness</option>
+            <option value="Colorless">Colorless</option>
+            <option value="Trainer">Trainer</option>
+            <option value="Energy">Energy</option>
+
+        </select>
+    </div>
+
+    <form method="POST">
+        <button type="submit" class="save-collection">Save Collection</button>
+        <div class="container">
+            <div class="grid">
+                {% for card in all_cards %}
+                <div class="card" id="card-{{ card.id }}" card-type="{{ card.cardtype }}">
+                    <img src="{{ url_for('static', filename='images/' + card.id + '.jpg') }}" alt="{{ card.name }}" id="img-{{ card.id }}" onclick="openModal('{{ card.id }}')">
+                    <div class="controls">
+                        <button type="button" onclick="decreaseCount('{{ card.id }}')">-</button>
+                        <input type="text" name="{{ card.id }}" id="count-{{ card.id }}" value="{{ collection.get(card.id, 0) }}" readonly>
+                        <button type="button" onclick="increaseCount('{{ card.id }}')">+</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Summary Panel -->
+            <div class="summary-panel">
+                <h2>Summary</h2>
+                <ul>
+                    <li>Pokémon: {{ total_pokemon_count }} ({{ unique_pokemon_count }} unique)</li>
+                    <li>Trainers:{{ total_trainer_count }} ({{ unique_trainer_count }} unique)</li>
+                    <li>Energy: {{ total_energy_count }} ({{ unique_energy_count }} unique)</li>
+                    <li><strong>Total: {{ total_pokemon_count + total_trainer_count + total_energy_count }} ({{ unique_pokemon_count + unique_trainer_count + unique_energy_count }} unique)</strong></li>
+                </ul>
+            </div>
+
+            <!-- Modal structure -->
+            <div id="modal" class="modal">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <img class="modal-content" id="modal-image">
+                <div id="caption"></div>
+            </div>
+        </div>
+    </form>
+    <script src="{{ url_for('static', filename='script/collection.js') }}"></script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Deck - Join Seat {{ seat }}</title>
+    <title>Select User - Join Seat {{seat}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,17 +14,17 @@
         .container {
             margin-top: 50px;
         }
-        .deck-list {
+        .user-list {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
         }
-        .deck-list button {
+        .user-list button {
             padding: 10px 20px;
             margin: 10px;
             font-size: 18px;
             cursor: pointer;
-            background-color: #007BFF;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -32,19 +32,19 @@
     </style>
 </head>
 <body>
-    <h1>Select a Deck for {{ username }} - Join Seat {{ seat }}</h1>
+    <h1>Select a User to Join Seat {{seat}}</h1>
 
     <div class="container">
-        <div class="deck-list">
-            {% for deck in decks %}
-                <a href="{{ url_for('game.board', deck=deck, username=username, seat=seat) }}">
-                    <button>{{ deck }}</button>
+        <div class="user-list">
+            {% for user in users %}
+                <a href="{{ url_for('home.join_seat_select_deck', username=user, seat=seat) }}">
+                    <button>{{ user }}</button>
                 </a>
             {% endfor %}
         </div>
     </div>
 
     <br><br>
-    <a href="{{ url_for('home.select_user', seat=seat) }}" style="color: #ffffff">Back to User Selection</a>
+    <a href="{{ url_for('home.home') }}" style="color: #ffffff">Back to Home</a>
 </body>
 </html>

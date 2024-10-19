@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Board</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game/board.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game/control_panel.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/game/view_panel.css') }}">
+</head>
+<body>
+
+<!-- Main wrapper -->
+<div class="gameboard-wrapper">
+
+    <!-- Control panel with elements -->
+    <div class="control-panel">
+        <!-- Status text -->
+        <div class="status-text status-setup" id="statusText">Wait for Opponent</div>
+
+        <!-- Dynamic button -->
+        <button class="action-button disabled-action-button" id="actionButton" disabled>-</button>
+
+        <button class="action-button coin-flip-base" id="coinButton">Flip a Coin</button>
+
+        <!-- Scrollable history box -->
+        <div class="history-box" id="historyBox">
+        </div>
+
+        <!-- New Game button -->
+        <button class="new-game-button disabled-new-game-button" id="newGameButton" disabled>New Game</button>
+    </div>
+
+    <!-- Gameboard container (scrollable) -->
+    {% include 'game/board.html' %}
+
+    <!-- Right panel -->
+    <div class="view-panel" id="view-panel">
+        <button id="move-all-btn">Move All</button>
+        <div id="card-panel"></div>
+    </div>
+
+</div>
+
+<script>
+    const seat = {{seat}};
+    const username = "{{username}}";
+    const deckname = "{{deckname}}";
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="/static/script/game/ui.js"></script>
+<script src="/static/script/game/listeners.js"></script>
+<script src="/static/script/game/socket.js"></script>
+
+</body>
+</html>

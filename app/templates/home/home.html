@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon TCG</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+</head>
+<body>
+    <h1>Pokemon TCG</h1>
+
+    <div class="container">
+        <!-- Manage Cards & Decks Pane -->
+        <div class="pane">
+            <h2>Manage Cards & Decks</h2>
+            {% for user in users %}
+                <a href="{{ url_for('user.user_page', username=user) }}">
+                    <button>{{ user }}</button>
+                </a>
+            {% endfor %}
+            <a href="{{ url_for('home.new_user') }}">
+                <button class="new-user-btn">New User</button>
+            </a>
+        </div>
+
+        <!-- Play a Game Pane -->
+        <div class="pane">
+            <h2>Play a Game</h2>
+            <button class="join-seat1-btn" onclick="window.location.href='{{ url_for('home.join_seat_select_user', seat=1) }}'">Join in Seat 1</button>
+            <button class="join-seat2-btn" onclick="window.location.href='{{ url_for('home.join_seat_select_user', seat=2) }}'">Join in Seat 2</button>
+        </div>
+    </div>
+</body>
+</html>

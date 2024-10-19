@@ -13,19 +13,33 @@ def view_edit_deck(username, deckname):
     collection_file = os.path.join(user_dir, 'collection.json')
     deck_file = os.path.join(deck_dir, 'deck.json')
     settings_file =  os.path.join(deck_dir, 'settings.json')
-    
+
+    if request.method == 'POST':
+        # Save the deck
+        deck = {}
+        for card_number, count in request.form.items():
+            deck[card_number] = int(count)
+
+        with open(deck_file, 'w') as file:
+            json.dump(deck, file)
+
+        return redirect(url_for('user.user_page', username=username))
+
+    # Load user's card colletion
     if os.path.exists(collection_file):
         with open(collection_file, 'r') as file:
             collection = json.load(file)
     else:
         collection = {}
 
+    # Load this deck
     if os.path.exists(deck_file):
         with open(deck_file, 'r') as file:
             deck = json.load(file)
     else:
         deck = {}
 
+    # Load this deck's settings
     if os.path.exists(settings_file):
         with open(settings_file, 'r') as file:
             settings = json.load(file)
@@ -36,19 +50,6 @@ def view_edit_deck(username, deckname):
             "unlimited_evolvers": False, 
             "unlimited_cards": False, 
         }
-
-
-    if request.method == 'POST':
-        # Handle updating the deck based on form submission
-        for card_number, count in request.form.items():
-            deck[card_number] = int(count)
-
-        # Save the updated deck
-        with open(deck_file, 'w') as file:
-            json.dump(deck, file)
-
-        flash('deck updated successfully!')
-        return redirect(url_for('users.user_page', username=username))
 
     # Load a list of all available pokemon
     file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
@@ -140,7 +141,7 @@ def view_edit_deck(username, deckname):
                 total_pokemon_count += count
 
     # Pass summary statistics to the template
-    return render_template('deck.html', username=username, deckname=deckname, deck=deck, all_cards=filtered_cards,
+    return render_template('deck/deck.html', username=username, deckname=deckname, deck=deck, all_cards=filtered_cards,
                            unique_pokemon_count=unique_pokemon_count, total_pokemon_count=total_pokemon_count,
                            unique_trainer_count=unique_trainer_count, total_trainer_count=total_trainer_count,
                            unique_energy_count=unique_energy_count, total_energy_count=total_energy_count)

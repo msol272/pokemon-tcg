@@ -39,12 +39,9 @@ board = {
 }
 game_state = "ready"
 
-@game_bp.route('/gameboard')
-def gameboard():
-    # Retrieve query parameters from the URL
-    seat = int(request.args.get('seat'))
-    return render_template('gameboard.html', seat=seat)
-
+# ##############################################################################
+# Helper functions
+# ##############################################################################
 def load_card_list(username, deckname):
     # Load all available Pokémon cards
     file_path = os.path.join(current_app.root_path, "static/pokemon_cards_data.json")
@@ -73,10 +70,10 @@ def set_game_state(state):
     game_state = state
     emit('game_state_change', state, broadcast=True)    
 
-def set_card_stack(spot, cards):
+def set_cell_cards(spot, cards):
     global board
     board[spot] = cards
-    emit('set_card_stack', {'spot': spot, 'cards': cards}, broadcast=True)
+    emit('set_cell_cards', {'spot': spot, 'cards': cards}, broadcast=True)
 
 def reset_board():
     global board
@@ -84,11 +81,21 @@ def reset_board():
         board[key] = []
     emit('sync_board', board, broadcast=True)
 
-# SocketIO event for handling real-time updates
+# ##############################################################################
+# Flask Routes
+# ##############################################################################
+@game_bp.route('/game')
+def game():
+    # Retrieve query parameters from the URL
+    seat = int(request.args.get('seat'))
+    username = request.args.get('username')
+    deckname = request.args.get('deck')
+    return render_template('game/game.html', seat=seat, username=username, deckname=deckname)
+
+# ##############################################################################
+# Socket IO
+# ##############################################################################
 def register_socketio_events(socketio):
-    @socketio.on('cell_selected')
-    def handle_cell_selected(data):
-        emit('set_right_panel', board[data['spot']])
     
     @socketio.on('join_game')
     def handle_player_join(data):
@@ -139,19 +146,23 @@ def register_socketio_events(socketio):
         reset_board()
 
         # Deal cards
-        set_card_stack('seat1-prizes', players[1]['cards'][0:6])
-        set_card_stack('seat1-hand', players[1]['cards'][6:13])
-        set_card_stack('seat1-deck', players[1]['cards'][13:])
+        set_cell_cards('seat1-prizes', players[1]['cards'][0:6])
+        set_cell_cards('seat1-hand', players[1]['cards'][6:13])
+        set_cell_cards('seat1-deck', players[1]['cards'][13:])
 
-        set_card_stack('seat2-prizes', players[2]['cards'][0:6])
-        set_card_stack('seat2-hand', players[2]['cards'][6:13])
-        set_card_stack('seat2-deck', players[2]['cards'][13:])
+        set_cell_cards('seat2-prizes', players[2]['cards'][0:6])
+        set_cell_cards('seat2-hand', players[2]['cards'][6:13])
+        set_cell_cards('seat2-deck', players[2]['cards'][13:])
 
         players[1]['ready'] = False
         players[2]['ready'] = False
 
         set_game_state('setup')
 
+    @socketio.on('cell_selected')
+    def handle_cell_selected(data):
+        emit('set_view_panel_cards', board[data['spot']])
+    
     @socketio.on('coin_button')
     def coin_flip(user):
         result = random.choice(['Heads', 'Tails'])

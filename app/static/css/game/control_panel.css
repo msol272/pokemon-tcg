@@ -1,0 +1,94 @@
+/* Control panel styles */
+.control-panel {
+    width: 200px;
+    background-color: #2e2e2e;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    color: white;
+    padding: 10px;
+}
+
+.status-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.status-your-turn {
+    color: red;
+}
+
+.history-box {
+    width: 100%; /* Keep width at 100% */
+    max-width: 100%; /* Prevents the box from growing beyond its container */
+    height: 60%;
+    background-color: #404040;
+    border: 1px solid #cccccc;
+    color: #ffffff;
+    overflow-y: auto;
+    overflow-x: auto; /* Horizontal scrolling */
+    white-space: nowrap; /* Prevent text wrapping */
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Button styles */
+.action-button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    font-size: 16px;
+
+}
+
+.disabled-action-button {
+    cursor: not-allowed;
+    background-color: #555555;
+    color: #cccccc;
+}
+
+.enabled-action-button {
+    cursor: pointer;
+    background-color: #00bfff;
+    color: white;
+}
+
+.coin-flip-base {
+    cursor: pointer;
+    background-color: #808080;
+    color: white;
+}
+
+.coin-flip-result {
+    cursor: pointer;
+    background-color: #00bfff;
+    color: white;
+}
+
+.new-game-button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    font-size: 16px;
+
+}
+
+.disabled-new-game-button {
+    cursor: not-allowed;
+    background-color: #555555;
+    color: #cccccc;
+}
+
+.enabled-new-game-button {
+    cursor: pointer;
+    background-color: #4caf50;
+    color: white;
+}

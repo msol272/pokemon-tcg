@@ -1,0 +1,168 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1e1e1e;
+    color: #cccccc;
+    position: relative;
+}
+h1 {
+    text-align: center;
+}
+/* Card list */
+.container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 10px;
+}
+.card {
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #2a2a2a;
+    transition: background-color 0.3s;
+}
+.highlight {
+    background-color: #FFD700;
+}
+img {
+    max-width: 100%;
+    border-radius: 5px;
+}
+.controls {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+input[type="text"] {
+    width: 50px;
+    text-align: center;
+}
+
+/* Top controls */
+.save-collection {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.save-collection:hover {
+    background-color: #0056b3;
+}
+
+#search-bar {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #2a2a2a;
+    color: #fff;
+}
+
+#view-mode, #card-type {
+    margin-left: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #2a2a2a;
+    color: #fff;
+}
+
+/* Summary panel on right side */
+.summary-panel {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    color: #cccccc;
+    margin-left: 20px; /* Space between grid and summary */
+    position: sticky;   /* Make it sticky */
+    top: 20px;         /* Offset from the top */
+    height: fit-content; /* Allow height to fit content */
+}
+
+.summary-panel h2 {
+    text-align: center;
+}
+
+.summary-panel ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.summary-panel li {
+    margin: 10px 0;
+}
+
+.summary-panel li strong {
+    font-size: 1.2em; /* Increase size for total */
+}
+
+/* Modal popup */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%; /* Can be adjusted */
+    max-width: 700px; /* Can be adjusted */
+}
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#caption {
+    margin: auto;
+    display: block;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+}
+
