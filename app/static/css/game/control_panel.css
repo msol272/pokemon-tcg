@@ -1,8 +1,8 @@
 /* Control panel styles */
 .control-panel {
-    width: 150px;
+    width: 20%;
     background-color: #2e2e2e;
-    height: 100vh;
+    height: 100% - 2px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -23,9 +23,8 @@
 }
 
 .history-box {
-    width: 140px;
-    max-width: 140px;
-    height: 60%;
+    width: 90%;
+    height: 90%;
     background-color: #404040;
     border: 1px solid #cccccc;
     color: #ffffff;

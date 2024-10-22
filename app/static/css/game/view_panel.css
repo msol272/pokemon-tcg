@@ -1,8 +1,8 @@
 /* View panel styles */
 .view-panel {
-    width: 300px;
+    width: 15%;
     background-color: #2e2e2e;
-    height: 100vh; /* Match gameboard height */
+    height: 100% - 2px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -13,8 +13,8 @@
 
 /* Basic styling for the panel */
 #card-panel {
-  width: 150px;
-  height: 60vh;
+  width: 90%;
+  height: 100%;
   border: 1px solid #000;
   overflow-y: scroll;
   padding: 2px;
@@ -44,6 +44,10 @@ button {
 }
 
 #move-all-btn {
+  margin-bottom: 10px;
+}
+
+#flip-all-btn {
   margin-bottom: 10px;
 }
 
