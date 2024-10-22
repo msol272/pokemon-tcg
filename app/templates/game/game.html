@@ -38,9 +38,16 @@
     <!-- Right panel -->
     <div class="view-panel" id="view-panel">
         <button id="move-all-btn">Move All</button>
+        <button id="flip-all-btn">Flip All</button>
         <div id="card-panel"></div>
     </div>
-
+    
+    <!-- Modal structure -->
+    <div id="modal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modal-image">
+        <div id="caption"></div>
+    </div>
 </div>
 
 <script>

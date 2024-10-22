@@ -7,7 +7,7 @@ socket.on('player_update', function(data) {
 });
 
 // Add action to the history log
-socket.on('action_log', function(message) {
+socket.on('add_history_message', function(message) {
     addHistoryMessage(message);
 });
 
@@ -28,8 +28,16 @@ socket.on('set_cell_cards', function(data) {
     setCellCards(data.spot, data.cards);
 });
 
+socket.on('set_damage', function(data) {
+    setDamage(data.stack, data.damage);
+});
+
+socket.on('set_condition', function(data) {
+    setCondition(data.spot, data.condition);
+});
+
 socket.on('set_view_panel_cards', function(data) {
-    setViewPanelCards(data)
+    setViewPanelCards(data.cards, data.spot);
 });
 
 
