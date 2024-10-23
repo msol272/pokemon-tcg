@@ -16,8 +16,6 @@ board = {
     "seat1-discard" : [],
     "seat1-prizes"  : [],
     "seat1-hand"    : [],
-    "seat1-spare1"  : [],
-    "seat1-spare2"  : [],
     "seat1-b1"      : [],
     "seat1-b2"      : [],
     "seat1-b3"      : [],
@@ -29,8 +27,6 @@ board = {
     "seat2-discard" : [],
     "seat2-prizes"  : [],
     "seat2-hand"    : [],
-    "seat2-spare1"  : [],
-    "seat2-spare2"  : [],
     "seat2-b1"      : [],
     "seat2-b2"      : [],
     "seat2-b3"      : [],
@@ -43,8 +39,6 @@ labels = {
     "seat1-discard" : 'Discard',
     "seat1-prizes"  : 'Prizes',
     "seat1-hand"    : 'Hand',
-    "seat1-spare1"  : 'Table',
-    "seat1-spare2"  : 'Table',
     "seat1-b1"      : 'Bench',
     "seat1-b2"      : 'Bench',
     "seat1-b3"      : 'Bench',
@@ -56,8 +50,6 @@ labels = {
     "seat2-discard" : 'Discard',
     "seat2-prizes"  : 'Prizes',
     "seat2-hand"    : 'Hand',
-    "seat2-spare1"  : 'Table',
-    "seat2-spare2"  : 'Table',
     "seat2-b1"      : 'Bench',
     "seat2-b2"      : 'Bench',
     "seat2-b3"      : 'Bench',
@@ -68,6 +60,8 @@ labels = {
 
 game_state = "ready"
 game_round = 1
+
+history_messages = []
 
 # ##############################################################################
 # Helper functions
@@ -94,7 +88,7 @@ def load_card_list(username, deckname):
             card['damage'] = 0
             card['condition'] = 'NML'
             for i in range(0, count):
-                user_cards.append(card)
+                user_cards.append(copy.deepcopy(card))
     return user_cards
 
 def set_game_state(state):
@@ -112,6 +106,14 @@ def reset_board():
     for key in board:
         board[key] = []
     emit('sync_board', board, broadcast=True)
+
+def add_history_message(msg):
+    history_messages.append(msg)
+    emit('add_history_message', msg, broadcast=True)
+
+def clear_history():
+    history_messages.clear()
+    emit('clear_history', broadcast=True)
 
 # ##############################################################################
 # Flask Routes
@@ -136,10 +138,14 @@ def register_socketio_events(socketio):
         username = data['username']
         deckname = data['deckname']
         seat = int(data['seat'])
+
+        for msg in history_messages:
+            emit('add_history_message', msg)
+
         if players[seat]["sid"] == -1:
             cards = load_card_list(username, deckname)
             players[seat] = {'username': username, 'deckname': deckname, 'sid': request.sid, 'cards': cards}
-            emit('add_history_message', '{} joined seat {}'.format(username, seat), broadcast=True)
+            add_history_message('{} joined seat {}'.format(username, seat))
             if players[1]['username'] != '' and players[2]['username'] != '':
                 emit('set_new_game_enable', True, broadcast=True)
         else:
@@ -158,7 +164,7 @@ def register_socketio_events(socketio):
         # Find out which seat the player occupied, if any, and handle player leave
         for seat, player in players.items():
             if player and player['sid'] == request.sid:
-                emit('add_history_message', '{} left seat {}'.format(players[seat]['username'], seat), broadcast=True)
+                add_history_message('{} left seat {}'.format(players[seat]['username'], seat))
                 players[seat]['username'] = ''
                 players[seat]['deckname'] = ''
                 players[seat]['sid'] = -1
@@ -194,6 +200,8 @@ def register_socketio_events(socketio):
         players[2]['ready'] = False
 
         set_game_state('setup')
+        clear_history()
+        add_history_message('---New Game---')
 
     @socketio.on('cell_selected')
     def handle_cell_selected(data):
@@ -203,6 +211,7 @@ def register_socketio_events(socketio):
     def coin_flip(user):
         result = random.choice(['Heads', 'Tails'])
         emit('coin_flip_result', {'user': user, 'result': result}, broadcast=True)
+        add_history_message('{} flipped a coin: {}'.format(user, result));
 
     @socketio.on('action_button')
     def action_button(data):
@@ -210,19 +219,22 @@ def register_socketio_events(socketio):
         seat = int(data['seat'])
         if data['action'] == "Ready":
             players[seat]['ready'] = True
-            emit('add_history_message', "{} is ready".format(players[seat]['username']), broadcast=True)
+            add_history_message("{} is ready".format(players[seat]['username']))
             if players[1]['ready'] and players[2]['ready']:
                 set_game_state('p1-turn')
-                emit('add_history_message', "---{}'s Turn---".format(players[1]['username']), broadcast=True)
+                add_history_message("Starting game!")
+                add_history_message("---{}'s Turn {}---".format(players[1]['username'], game_round))
                 emit('sync_board', board, broadcast=True)
         elif data['action'] == "End Turn":
-            if game_state == 'p1-turn':                
+            if game_state == 'p1-turn':
+                add_history_message('End of turn')
+                add_history_message("---{}'s turn {}---".format(players[2]['username'], game_round))
                 set_game_state('p2-turn')
-                emit('add_history_message', '---{} ended turn {}---'.format(players[1]['username'], game_round), broadcast=True)
             elif game_state == 'p2-turn':                
-                set_game_state('p1-turn')   
-                emit('add_history_message', '---{} ended turn {}---'.format(players[2]['username'], game_round), broadcast=True)
                 game_round += 1
+                add_history_message('End of turn')
+                add_history_message("---{}'s turn {}---".format(players[1]['username'], game_round))
+                set_game_state('p1-turn')
 
     @socketio.on('move_card')
     def move_card(data):
@@ -251,7 +263,7 @@ def register_socketio_events(socketio):
         else:
             card_name = 'a card'
         msg = '{} moved {} from {} to {}'.format(user, card_name, labels[from_stack], labels[to_stack])
-        emit('add_history_message', msg, broadcast=True)
+        add_history_message(msg)
         emit('set_view_panel_cards', {'cards': board[from_stack], 'spot': from_stack})
 
     @socketio.on('move_stack')
@@ -273,7 +285,7 @@ def register_socketio_events(socketio):
             if len(board[from_stack]) > 0:
                 msg = '{} swapped {} and {}'.format(user, labels[from_stack], labels[to_stack])
             else:
-                msg = '{} moved {} cards to {}'.format(user, labels[from_stack], labels[to_stack])
+                msg = '{} moved all from {} to {}'.format(user, labels[from_stack], labels[to_stack])
         else:
             # Remove any damage
             for card in board[from_stack]:
@@ -281,10 +293,10 @@ def register_socketio_events(socketio):
             # Append all to destination
             board[to_stack].extend(board[from_stack])
             board[from_stack] = []
-            msg = '{} moved {} cards to {}'.format(user, labels[from_stack], labels[to_stack])
+            msg = '{} moved all cards from {} to {}'.format(user, labels[from_stack], labels[to_stack])
         set_cell_cards(from_stack, board[from_stack])
         set_cell_cards(to_stack, board[to_stack])
-        emit('add_history_message', msg, broadcast=True)
+        add_history_message(msg)
         emit('set_view_panel_cards', {'cards': board[from_stack], 'spot': from_stack})
 
     @socketio.on('shuffle_stack')
@@ -294,7 +306,7 @@ def register_socketio_events(socketio):
 
     @socketio.on('log_event')
     def log_event(msg):
-        emit('add_history_message', msg, broadcast=True)
+        add_history_message(msg)
 
     @socketio.on('add_damage')
     def add_damage(data):
@@ -304,7 +316,7 @@ def register_socketio_events(socketio):
         for card in board[stack]:
             card['damage'] = card['damage'] + 10
         emit('set_damage', {'stack': stack, 'damage': board[stack][0]['damage']}, broadcast=True)
-        emit('add_history_message', '{} added 10 damage to {}'.format(user, card_name), broadcast=True)
+        add_history_message('{} added 10 damage to {}'.format(user, card_name))
 
     @socketio.on('remove_damage')
     def remove_damage(data):
@@ -314,7 +326,7 @@ def register_socketio_events(socketio):
         for card in board[stack]:
             card['damage'] = max(0, card['damage'] - 10)
         emit('set_damage', {'stack': stack, 'damage': board[stack][0]['damage']}, broadcast=True)
-        emit('add_history_message', '{} removed 10 damage from {}'.format(user, card_name), broadcast=True)
+        add_history_message('{} removed 10 damage from {}'.format(user, card_name))
 
     @socketio.on('toggle_condition')
     def toggle_condition(data):
@@ -338,4 +350,4 @@ def register_socketio_events(socketio):
             new_condition = 'NML'
         board[spot][0]['condition'] = new_condition
         emit('set_condition', {'spot': spot, 'condition': new_condition}, broadcast=True)
-        emit('add_history_message', '{} set {} to {}'.format(user, card_name, new_condition), broadcast=True)
+        add_history_message('{} set {} to {}'.format(user, card_name, new_condition))

@@ -151,6 +151,11 @@ function addHistoryMessage(message) {
     historyBox.scrollTop = historyBox.scrollHeight; // Auto-scroll to bottom
 }
 
+function clearHistory() {
+    let historyBox = document.getElementById("historyBox");
+    historyBox.replaceChildren()
+}
+
 function setNewGameButton(enable) {
     let newGameButton = document.getElementById("newGameButton");
     if (enable) {
@@ -172,7 +177,6 @@ function updateGameState(state) {
         setStatusText("Setup", false);
         setActionButton("Ready", true);
         setCardsVisible(false);
-        addHistoryMessage('---New Game---')
     } else if ((state === 'p1-turn' && seat === 1) || 
                    (state === 'p2-turn' && seat === 2)) {
         setStatusText("Your Turn", true);

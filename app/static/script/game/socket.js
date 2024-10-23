@@ -11,6 +11,10 @@ socket.on('add_history_message', function(message) {
     addHistoryMessage(message);
 });
 
+socket.on('clear_history', function() {
+    clearHistory();
+});
+
 // Error popup
 socket.on('error', function(data) {
     alert(data.message)
@@ -51,6 +55,5 @@ socket.on('game_state_change', function(state) {
 });
 
 socket.on('coin_flip_result', function(data) {
-    addHistoryMessage(`${data.user} coin: ${data.result}`);
     setCoinButton(true, data.result)
 });
